@@ -3,7 +3,7 @@
  * Plugin Name:       Zymarg Product Builder
  * Plugin URI:        https://zymarg.com/zymarg-product-builder
  * Description:       Connected Elementor widgets for WooCommerce: Product Gallery, Variation Swatches, and Add to Cart. Build rich product layouts with synchronized widgets that work across separate sections.
- * Version:           0.5.0
+ * Version:           0.6.0
  * Author:            Zymarg
  * Author URI:        https://zymarg.com
  * License:           GPL-2.0-or-later
@@ -24,7 +24,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Plugin constants.
  */
-define( 'ZPB_VERSION', '0.5.0' );
+define( 'ZPB_VERSION', '0.6.0' );
 define( 'ZPB_PLUGIN_FILE', __FILE__ );
 define( 'ZPB_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'ZPB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -80,6 +80,34 @@ function zpb_bootstrap() {
 	\Zymarg\ProductBuilder\Plugin::instance();
 }
 add_action( 'plugins_loaded', 'zpb_bootstrap', 20 );
+
+/**
+ * Boot the GitHub-based auto-updater.
+ *
+ * Runs in admin context only — there's no reason for front-end requests to
+ * load the updater. WordPress's update transient is admin-only territory.
+ *
+ * To configure for a fork, change ZPB_GITHUB_OWNER / ZPB_GITHUB_REPO below.
+ */
+if ( ! defined( 'ZPB_GITHUB_OWNER' ) ) {
+	define( 'ZPB_GITHUB_OWNER', 'Aspeyash' );
+}
+if ( ! defined( 'ZPB_GITHUB_REPO' ) ) {
+	define( 'ZPB_GITHUB_REPO', 'Add-to-cart-' );
+}
+
+add_action(
+	'admin_init',
+	function () {
+		require_once ZPB_PLUGIN_DIR . 'includes/class-update-checker.php';
+		\Zymarg\ProductBuilder\Update_Checker::instance(
+			ZPB_PLUGIN_FILE,
+			ZPB_GITHUB_OWNER,
+			ZPB_GITHUB_REPO
+		);
+	},
+	5
+);
 
 /**
  * Detect WooCommerce reliably (constant + class + active plugin).
