@@ -3,7 +3,7 @@
  * Plugin Name:       Zymarg Product Builder
  * Plugin URI:        https://zymarg.com/zymarg-product-builder
  * Description:       Connected Elementor widgets for WooCommerce: Product Gallery, Variation Swatches, and Add to Cart. Build rich product layouts with synchronized widgets that work across separate sections.
- * Version:           0.1.0
+ * Version:           0.2.0
  * Author:            Zymarg
  * Author URI:        https://zymarg.com
  * License:           GPL-2.0-or-later
@@ -24,7 +24,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Plugin constants.
  */
-define( 'ZPB_VERSION', '0.1.0' );
+define( 'ZPB_VERSION', '0.2.0' );
 define( 'ZPB_PLUGIN_FILE', __FILE__ );
 define( 'ZPB_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'ZPB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -181,15 +181,12 @@ function zpb_render_notice( $message ) {
 register_activation_hook(
 	__FILE__,
 	function () {
-		// Reserved for future use (flush rewrites, seed default options, etc.).
-		if ( ! get_option( 'zpb_settings' ) ) {
-			add_option(
-				'zpb_settings',
-				array(
-					'version' => ZPB_VERSION,
-				)
-			);
-		}
+		// Seed default settings so widgets always have a baseline.
+		require_once ZPB_PLUGIN_DIR . 'includes/admin/class-settings-store.php';
+		\Zymarg\ProductBuilder\Admin\Settings_Store::seed_defaults();
+
+		// Show one-time welcome notice.
+		update_option( 'zpb_show_welcome_notice', 1 );
 	}
 );
 

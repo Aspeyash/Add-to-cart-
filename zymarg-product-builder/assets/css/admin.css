@@ -1,0 +1,129 @@
+/**
+ * Zymarg Product Builder — admin settings page styles.
+ */
+
+.zpb-settings__title {
+	display: flex;
+	align-items: baseline;
+	gap: 12px;
+	margin-bottom: 4px;
+}
+
+.zpb-settings__version {
+	font-size: 12px;
+	font-weight: 400;
+	color: #6c7781;
+	background: #f0f0f1;
+	padding: 2px 8px;
+	border-radius: 10px;
+}
+
+.zpb-settings__tabs {
+	margin-top: 12px;
+}
+
+.zpb-settings__body {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-top: 0;
+	padding: 20px 24px;
+	margin-top: -1px;
+}
+
+.zpb-form .description {
+	max-width: 640px;
+}
+
+.zpb-form table.form-table th {
+	padding-top: 18px;
+}
+
+/* Toggle switch */
+.zpb-toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	cursor: pointer;
+	user-select: none;
+}
+
+.zpb-toggle input[type="checkbox"] {
+	position: absolute;
+	opacity: 0;
+	width: 0;
+	height: 0;
+	pointer-events: none;
+}
+
+.zpb-toggle__slider {
+	position: relative;
+	display: inline-block;
+	width: 40px;
+	height: 22px;
+	background: #c3c4c7;
+	border-radius: 11px;
+	transition: background-color 0.18s ease;
+	flex-shrink: 0;
+}
+
+.zpb-toggle__slider::before {
+	content: "";
+	position: absolute;
+	top: 3px;
+	left: 3px;
+	width: 16px;
+	height: 16px;
+	background: #fff;
+	border-radius: 50%;
+	transition: transform 0.18s ease;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+}
+
+.zpb-toggle input[type="checkbox"]:checked ~ .zpb-toggle__slider {
+	background: #2271b1;
+}
+
+.zpb-toggle input[type="checkbox"]:checked ~ .zpb-toggle__slider::before {
+	transform: translateX(18px);
+}
+
+.zpb-toggle input[type="checkbox"]:focus-visible ~ .zpb-toggle__slider {
+	outline: 2px solid #2271b1;
+	outline-offset: 2px;
+}
+
+.zpb-toggle__text {
+	font-size: 13px;
+	color: #50575e;
+	min-width: 28px;
+}
+
+/* Reset form */
+.zpb-form--reset {
+	margin-top: 16px;
+	padding-top: 16px;
+	border-top: 1px solid #f0f0f1;
+}
+
+.zpb-reset-button {
+	color: #b32d2e !important;
+	border-color: #d9b1b1 !important;
+}
+.zpb-reset-button:hover {
+	color: #fff !important;
+	background: #b32d2e !important;
+	border-color: #b32d2e !important;
+}
+
+/* Welcome notice tweak */
+.zpb-welcome-notice p {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	flex-wrap: wrap;
+}
+
+/* Compact field rows */
+.zpb-field--toggle td {
+	padding-top: 14px;
+}

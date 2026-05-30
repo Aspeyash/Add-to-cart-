@@ -3,7 +3,7 @@ Contributors: zymarg
 Tags: woocommerce, elementor, add to cart, variation swatches, product gallery
 Requires at least: 6.0
 Tested up to: 6.5
-Stable tag: 0.1.0
+Stable tag: 0.2.0
 Requires PHP: 7.4
 WC requires at least: 7.0
 WC tested up to: 8.9
@@ -45,3 +45,13 @@ Zymarg Product Builder gives Elementor users a set of WooCommerce widgets that s
 * Client-side state bus (`window.ZPB`) keyed by product ID.
 * Add to Cart widget: quantity stepper (with on/off label toggle), AJAX, Buy Now option, full Content + Style controls, redirect after add, out-of-stock state.
 * AJAX endpoint with WooCommerce fragments for theme mini-cart updates.
+
+
+= 0.2.0 =
+* Admin: WooCommerce -> Product Builder settings page (General + Add to Cart Defaults tabs)
+* Tabbed UI with Save Changes and Reset to Defaults per tab
+* Settings_Store helper: dot-notation get(), section reset, default seeding on activation
+* Add to Cart widget Elementor controls now inherit defaults from settings
+* Out-of-stock behavior: Disable button / Hide button / Show message (admin-configurable)
+* Plugins-list "Settings" and "Docs" links
+* One-time welcome notice on activation

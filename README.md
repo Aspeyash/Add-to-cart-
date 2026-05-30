@@ -11,7 +11,7 @@ The actual WordPress plugin lives in [`zymarg-product-builder/`](./zymarg-produc
 | 1 | done | Plugin scaffold, dependency checks, Elementor category, asset pipeline |
 | 2 | done | Product Context + state bus + product JSON injection |
 | 3 | done | **Add to Cart widget** (simple + variable, AJAX, full styling) |
-| 4 | next | Admin: Global settings page |
+| 4 | done | Admin: Global settings page (General + Add to Cart defaults) |
 | 5 | next | Admin: Attribute term meta (color picker, image upload) |
 | 6 | next | **Variation Swatches widget** + cross-section sync |
 | 7 | next | **Product Gallery widget** + variation image swap |

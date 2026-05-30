@@ -13,6 +13,7 @@ use Elementor\Group_Control_Border;
 use Elementor\Group_Control_Box_Shadow;
 use Elementor\Group_Control_Typography;
 use Elementor\Widget_Base;
+use Zymarg\ProductBuilder\Admin\Settings_Store;
 use Zymarg\ProductBuilder\Assets;
 use Zymarg\ProductBuilder\Frontend\Product_Data;
 use Zymarg\ProductBuilder\Plugin;
@@ -84,7 +85,7 @@ class Add_To_Cart_Widget extends Widget_Base {
 			array(
 				'label'   => __( 'Product Source', 'zymarg-product-builder' ),
 				'type'    => Controls_Manager::SELECT,
-				'default' => 'current',
+				'default' => Settings_Store::get( 'general.product_source', 'current' ),
 				'options' => array(
 					'current' => __( 'Current Product', 'zymarg-product-builder' ),
 					'manual'  => __( 'Pick a Product', 'zymarg-product-builder' ),
@@ -116,7 +117,7 @@ class Add_To_Cart_Widget extends Widget_Base {
 			array(
 				'label'        => __( 'Show Stock Status', 'zymarg-product-builder' ),
 				'type'         => Controls_Manager::SWITCHER,
-				'default'      => 'yes',
+				'default'      => Settings_Store::get( 'add_to_cart.show_stock', 'yes' ),
 				'label_on'     => __( 'Show', 'zymarg-product-builder' ),
 				'label_off'    => __( 'Hide', 'zymarg-product-builder' ),
 				'return_value' => 'yes',
@@ -128,7 +129,7 @@ class Add_To_Cart_Widget extends Widget_Base {
 			array(
 				'label'        => __( 'Show Price', 'zymarg-product-builder' ),
 				'type'         => Controls_Manager::SWITCHER,
-				'default'      => '',
+				'default'      => Settings_Store::get( 'add_to_cart.show_price', '' ) === 'yes' ? 'yes' : '',
 				'return_value' => 'yes',
 			)
 		);
@@ -138,7 +139,7 @@ class Add_To_Cart_Widget extends Widget_Base {
 			array(
 				'label'        => __( 'Show Quantity Stepper', 'zymarg-product-builder' ),
 				'type'         => Controls_Manager::SWITCHER,
-				'default'      => 'yes',
+				'default'      => Settings_Store::get( 'add_to_cart.show_quantity', 'yes' ),
 				'return_value' => 'yes',
 			)
 		);
@@ -148,7 +149,7 @@ class Add_To_Cart_Widget extends Widget_Base {
 			array(
 				'label'        => __( 'Show Quantity Label', 'zymarg-product-builder' ),
 				'type'         => Controls_Manager::SWITCHER,
-				'default'      => 'yes',
+				'default'      => Settings_Store::get( 'add_to_cart.show_quantity_label', 'yes' ),
 				'return_value' => 'yes',
 				'condition'    => array( 'show_quantity' => 'yes' ),
 			)
@@ -159,7 +160,7 @@ class Add_To_Cart_Widget extends Widget_Base {
 			array(
 				'label'     => __( 'Quantity Label Text', 'zymarg-product-builder' ),
 				'type'      => Controls_Manager::TEXT,
-				'default'   => __( 'Quantity:', 'zymarg-product-builder' ),
+				'default'   => Settings_Store::get( 'add_to_cart.quantity_label', __( 'Quantity:', 'zymarg-product-builder' ) ),
 				'condition' => array(
 					'show_quantity'       => 'yes',
 					'show_quantity_label' => 'yes',
@@ -227,7 +228,7 @@ class Add_To_Cart_Widget extends Widget_Base {
 			array(
 				'label'   => __( 'Button Text', 'zymarg-product-builder' ),
 				'type'    => Controls_Manager::TEXT,
-				'default' => __( 'Add to Cart', 'zymarg-product-builder' ),
+				'default' => Settings_Store::get( 'add_to_cart.button_text', __( 'Add to Cart', 'zymarg-product-builder' ) ),
 			)
 		);
 
@@ -275,7 +276,7 @@ class Add_To_Cart_Widget extends Widget_Base {
 			array(
 				'label'        => __( 'AJAX Add to Cart', 'zymarg-product-builder' ),
 				'type'         => Controls_Manager::SWITCHER,
-				'default'      => 'yes',
+				'default'      => Settings_Store::get( 'general.use_ajax', 'yes' ),
 				'return_value' => 'yes',
 			)
 		);
@@ -285,7 +286,7 @@ class Add_To_Cart_Widget extends Widget_Base {
 			array(
 				'label'   => __( 'After Adding', 'zymarg-product-builder' ),
 				'type'    => Controls_Manager::SELECT,
-				'default' => 'none',
+				'default' => Settings_Store::get( 'add_to_cart.redirect_after', 'none' ),
 				'options' => array(
 					'none'     => __( 'Stay on Page', 'zymarg-product-builder' ),
 					'cart'     => __( 'Go to Cart', 'zymarg-product-builder' ),
@@ -318,7 +319,7 @@ class Add_To_Cart_Widget extends Widget_Base {
 			array(
 				'label'        => __( 'Show Buy Now Button', 'zymarg-product-builder' ),
 				'type'         => Controls_Manager::SWITCHER,
-				'default'      => '',
+				'default'      => Settings_Store::get( 'add_to_cart.show_buy_now', '' ) === 'yes' ? 'yes' : '',
 				'return_value' => 'yes',
 			)
 		);
@@ -328,7 +329,7 @@ class Add_To_Cart_Widget extends Widget_Base {
 			array(
 				'label'     => __( 'Button Text', 'zymarg-product-builder' ),
 				'type'      => Controls_Manager::TEXT,
-				'default'   => __( 'Buy Now', 'zymarg-product-builder' ),
+				'default'   => Settings_Store::get( 'add_to_cart.buy_now_text', __( 'Buy Now', 'zymarg-product-builder' ) ),
 				'condition' => array( 'show_buy_now' => 'yes' ),
 			)
 		);
