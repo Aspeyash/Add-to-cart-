@@ -1,0 +1,17 @@
+# Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build / deps (reserved for future)
+node_modules/
+vendor/
+*.zip
+
+# Logs
+*.log
