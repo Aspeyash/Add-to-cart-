@@ -153,6 +153,53 @@ class Gallery_Widget extends Widget_Base {
 		);
 
 		$this->add_control(
+			'main_image_size',
+			array(
+				'label'       => __( 'Main Image Resolution', 'zymarg-product-builder' ),
+				'description' => __( 'Higher resolutions look sharper on retina screens but use more bandwidth. "Full Resolution" uses the original uploaded file.', 'zymarg-product-builder' ),
+				'type'        => Controls_Manager::SELECT,
+				'default'     => 'woocommerce_single',
+				'options'     => array(
+					'woocommerce_single'    => __( 'WooCommerce Single (default)', 'zymarg-product-builder' ),
+					'woocommerce_thumbnail' => __( 'WooCommerce Thumbnail', 'zymarg-product-builder' ),
+					'medium'                => __( 'Medium', 'zymarg-product-builder' ),
+					'medium_large'          => __( 'Medium Large', 'zymarg-product-builder' ),
+					'large'                 => __( 'Large', 'zymarg-product-builder' ),
+					'full'                  => __( 'Full Resolution (original)', 'zymarg-product-builder' ),
+				),
+			)
+		);
+
+		$this->add_control(
+			'thumb_image_size',
+			array(
+				'label'   => __( 'Thumbnail Resolution', 'zymarg-product-builder' ),
+				'type'    => Controls_Manager::SELECT,
+				'default' => 'woocommerce_thumbnail',
+				'options' => array(
+					'woocommerce_gallery_thumbnail' => __( 'WC Gallery Thumbnail', 'zymarg-product-builder' ),
+					'woocommerce_thumbnail'        => __( 'WooCommerce Thumbnail (default)', 'zymarg-product-builder' ),
+					'thumbnail'                    => __( 'WP Thumbnail', 'zymarg-product-builder' ),
+					'medium'                       => __( 'Medium', 'zymarg-product-builder' ),
+				),
+			)
+		);
+
+		$this->add_control(
+			'lightbox_image_size',
+			array(
+				'label'       => __( 'Lightbox / Zoom Image Resolution', 'zymarg-product-builder' ),
+				'description' => __( 'Image used when the lightbox opens or zoom is active. "Full Resolution" gives the sharpest zoom.', 'zymarg-product-builder' ),
+				'type'        => Controls_Manager::SELECT,
+				'default'     => 'full',
+				'options'     => array(
+					'large' => __( 'Large', 'zymarg-product-builder' ),
+					'full'  => __( 'Full Resolution (original)', 'zymarg-product-builder' ),
+				),
+			)
+		);
+
+		$this->add_control(
 			'show_nav_arrows',
 			array(
 				'label'        => __( 'Show Navigation Arrows', 'zymarg-product-builder' ),
@@ -614,8 +661,18 @@ class Gallery_Widget extends Widget_Base {
 
 		Product_Data::instance()->queue( $product->get_id() );
 
-		// Build the image list (featured + gallery).
-		$images = $this->collect_images( $product, ! empty( $settings['featured_first'] ) && 'yes' === $settings['featured_first'] );
+		// Build the image list (featured + gallery) using the resolutions
+		// chosen in the widget controls (default: WC sensible sizes).
+		$image_sizes = array(
+			'thumb'    => ! empty( $settings['thumb_image_size'] )    ? $settings['thumb_image_size']    : 'woocommerce_thumbnail',
+			'main'     => ! empty( $settings['main_image_size'] )     ? $settings['main_image_size']     : 'woocommerce_single',
+			'lightbox' => ! empty( $settings['lightbox_image_size'] ) ? $settings['lightbox_image_size'] : 'full',
+		);
+		$images = $this->collect_images(
+			$product,
+			! empty( $settings['featured_first'] ) && 'yes' === $settings['featured_first'],
+			$image_sizes
+		);
 
 		if ( empty( $images ) ) {
 			$this->render_placeholder( __( 'This product has no images yet.', 'zymarg-product-builder' ) );
@@ -664,9 +721,16 @@ class Gallery_Widget extends Widget_Base {
 	 *
 	 * @param \WC_Product $product        Product.
 	 * @param bool        $featured_first Place featured image first.
-	 * @return array Each item: [ id, thumb_url, main_url, full_url, alt ]
+	 * @param array       $sizes          Map with 'thumb', 'main', 'lightbox'
+	 *                                    image-size slugs. Falls back to
+	 *                                    sensible WC defaults if missing.
+	 * @return array Each item: [ id, thumb, main, full, alt ]
 	 */
-	private function collect_images( $product, $featured_first ) {
+	private function collect_images( $product, $featured_first, $sizes = array() ) {
+		$thumb_size    = isset( $sizes['thumb'] )    ? $sizes['thumb']    : 'woocommerce_thumbnail';
+		$main_size     = isset( $sizes['main'] )     ? $sizes['main']     : 'woocommerce_single';
+		$lightbox_size = isset( $sizes['lightbox'] ) ? $sizes['lightbox'] : 'full';
+
 		$ids = array();
 
 		$featured_id = (int) $product->get_image_id();
@@ -686,9 +750,13 @@ class Gallery_Widget extends Widget_Base {
 
 		$images = array();
 		foreach ( $ids as $id ) {
-			$thumb = wp_get_attachment_image_url( $id, 'woocommerce_thumbnail' );
-			$main  = wp_get_attachment_image_url( $id, 'woocommerce_single' );
-			$full  = wp_get_attachment_image_url( $id, 'full' );
+			$thumb = wp_get_attachment_image_url( $id, $thumb_size );
+			$main  = wp_get_attachment_image_url( $id, $main_size );
+			$full  = wp_get_attachment_image_url( $id, $lightbox_size );
+			// Fallbacks if a chosen size doesn't exist (e.g. site never regenerated thumbnails).
+			if ( ! $thumb ) { $thumb = wp_get_attachment_image_url( $id, 'thumbnail' ); }
+			if ( ! $main )  { $main  = wp_get_attachment_image_url( $id, 'full' ); }
+			if ( ! $full )  { $full  = $main; }
 			if ( ! $thumb || ! $main ) {
 				continue;
 			}
@@ -696,7 +764,7 @@ class Gallery_Widget extends Widget_Base {
 				'id'    => $id,
 				'thumb' => $thumb,
 				'main'  => $main,
-				'full'  => $full ? $full : $main,
+				'full'  => $full,
 				'alt'   => (string) get_post_meta( $id, '_wp_attachment_image_alt', true ),
 			);
 		}

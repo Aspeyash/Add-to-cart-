@@ -188,6 +188,15 @@ final class Update_Checker {
 			'requires_php'      => defined( 'ZPB_MIN_PHP' ) ? ZPB_MIN_PHP : '7.4',
 			'tested'            => '6.5',
 			'last_updated'      => $release['published_at'],
+			'icons'             => array(
+				'1x'      => ZPB_ASSETS_URL . 'images/icon-128x128.svg',
+				'2x'      => ZPB_ASSETS_URL . 'images/icon-256x256.svg',
+				'default' => ZPB_ASSETS_URL . 'images/icon-256x256.svg',
+			),
+			'banners'           => array(
+				'low'  => ZPB_ASSETS_URL . 'images/banner-1544x500.svg',
+				'high' => ZPB_ASSETS_URL . 'images/banner-1544x500.svg',
+			),
 		);
 	}
 
