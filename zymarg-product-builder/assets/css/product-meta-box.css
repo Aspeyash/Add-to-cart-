@@ -1,0 +1,83 @@
+/**
+ * Zymarg Product Builder — per-product overrides meta box.
+ * Scoped to the WC product data panel.
+ */
+
+#zpb_product_builder_data .zpb-overrides-intro p {
+	margin: 8px 12px 12px;
+	color: #50575e;
+}
+
+#zpb_product_builder_data .zpb-overrides__heading {
+	margin: 12px 12px 6px;
+	padding-top: 8px;
+	font-size: 13px;
+	color: #2c3338;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	border-top: 1px solid #f0f0f1;
+}
+
+#zpb_product_builder_data .options_group:first-child .zpb-overrides__heading,
+#zpb_product_builder_data .zpb-overrides-intro + .options_group .zpb-overrides__heading {
+	border-top: 0;
+}
+
+#zpb_product_builder_data .zpb-overrides__notice {
+	margin: 8px 12px 12px;
+	padding: 8px 12px;
+	background: #f5f5f5;
+	color: #555;
+	border-radius: 3px;
+	font-style: italic;
+}
+
+#zpb_product_builder_data .zpb-overrides__field--checkbox-group {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+#zpb_product_builder_data .zpb-overrides__legend {
+	display: block;
+	margin-bottom: 4px;
+	color: #646970;
+	font-size: 12px;
+	font-style: italic;
+}
+
+#zpb_product_builder_data .zpb-overrides__checkbox {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	margin-right: 16px;
+	cursor: pointer;
+	color: #2c3338;
+	font-weight: 400;
+}
+
+#zpb_product_builder_data .zpb-overrides__checkbox input[type="checkbox"] {
+	margin-top: 0;
+}
+
+#zpb_product_builder_data .zpb-overrides__field--reset {
+	background: #fff5f5;
+	padding: 12px;
+	border: 1px solid #f1d1d1;
+	border-radius: 4px;
+	margin: 12px;
+}
+
+#zpb_product_builder_data .zpb-overrides__reset-label strong {
+	color: #b32d2e;
+}
+
+#zpb_product_builder_data.is-reset-pending .options_group:not(:last-child) {
+	opacity: 0.4;
+	pointer-events: none;
+}
+
+#zpb_product_builder_data.is-reset-pending .options_group:not(:last-child)::after {
+	content: "";
+}

@@ -46,9 +46,14 @@ if ( 'custom' === $redirect_after && ! empty( $settings['redirect_url']['url'] )
 	$redirect_url_value = esc_url( $settings['redirect_url']['url'] );
 }
 
-// Out-of-stock behavior from admin defaults.
-$oos_behavior = Settings_Store::get( 'add_to_cart.out_of_stock_behavior', 'disable' );
-$oos_text     = Settings_Store::get( 'add_to_cart.out_of_stock_text', __( 'Out of Stock', 'zymarg-product-builder' ) );
+// Out-of-stock behavior — resolved per-product (override → global → default).
+if ( class_exists( '\Zymarg\ProductBuilder\Product_Overrides' ) ) {
+	$oos_behavior = \Zymarg\ProductBuilder\Product_Overrides::get_add_to_cart( $product_id, 'out_of_stock_behavior', 'disable' );
+	$oos_text     = \Zymarg\ProductBuilder\Product_Overrides::get_add_to_cart( $product_id, 'out_of_stock_text', __( 'Out of Stock', 'zymarg-product-builder' ) );
+} else {
+	$oos_behavior = Settings_Store::get( 'add_to_cart.out_of_stock_behavior', 'disable' );
+	$oos_text     = Settings_Store::get( 'add_to_cart.out_of_stock_text', __( 'Out of Stock', 'zymarg-product-builder' ) );
+}
 $hide_button  = ! $is_in_stock && 'hide' === $oos_behavior;
 $show_oos_msg = ! $is_in_stock && 'message' === $oos_behavior;
 

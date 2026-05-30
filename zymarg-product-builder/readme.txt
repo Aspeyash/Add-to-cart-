@@ -3,7 +3,7 @@ Contributors: zymarg
 Tags: woocommerce, elementor, add to cart, variation swatches, product gallery
 Requires at least: 6.0
 Tested up to: 6.5
-Stable tag: 0.6.0
+Stable tag: 0.7.0
 Requires PHP: 7.4
 WC requires at least: 7.0
 WC tested up to: 8.9
@@ -97,3 +97,14 @@ Zymarg Product Builder gives Elementor users a set of WooCommerce widgets that s
 * GitHub Action included: tagging vX.Y.Z (or X.Y.Z) automatically builds a clean plugin ZIP and attaches it to the release. The Action also fails if the tag does not match the Version: header, preventing accidental version mismatches.
 * Pre-releases and drafts are excluded automatically (we use /releases/latest).
 * Filesystem-aware extractor handles both attached release ZIPs and zipball fallbacks.
+
+
+= 0.7.0 =
+* New: per-product overrides via the "Product Builder" tab in the WooCommerce Product Data panel
+* Override attribute display type per-product (Inherit / Color / Image / Label / Button / Default Dropdown)
+* Hide attributes from the Variation Swatches widget per-product (auto-resolved server-side so cart submission still picks a real variation)
+* Override Add to Cart button text, Buy Now visibility, out-of-stock behavior, and redirect-after-add per-product
+* Disable any of the three widgets (Add to Cart, Variation Swatches, Product Gallery) per-product
+* Reset all overrides for a product with a single checkbox + confirm dialog
+* HPOS-compatible save handler (uses woocommerce_admin_process_product_object)
+* Resolution chain: per-product override -> global setting -> hard-coded default
