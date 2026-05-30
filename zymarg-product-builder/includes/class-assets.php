@@ -77,6 +77,7 @@ final class Assets {
 			true
 		);
 
+		// Localize i18n strings.
 		wp_localize_script(
 			self::HANDLE_STATE,
 			'ZPBConfig',
@@ -88,6 +89,8 @@ final class Assets {
 					'adding'        => __( 'Adding...', 'zymarg-product-builder' ),
 					'added'         => __( 'Added!', 'zymarg-product-builder' ),
 					'error'         => __( 'Could not add to cart.', 'zymarg-product-builder' ),
+					'networkError'  => __( 'Network error. Could not reach the server.', 'zymarg-product-builder' ),
+					'tryAgain'      => __( 'Try again', 'zymarg-product-builder' ),
 					'inStock'       => __( 'In Stock', 'zymarg-product-builder' ),
 					'outOfStock'    => __( 'Out of stock', 'zymarg-product-builder' ),
 					'selectOptions' => __( 'Please select product options.', 'zymarg-product-builder' ),

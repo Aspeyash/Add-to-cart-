@@ -3,7 +3,7 @@ Contributors: zymarg
 Tags: woocommerce, elementor, add to cart, variation swatches, product gallery
 Requires at least: 6.0
 Tested up to: 6.5
-Stable tag: 0.7.0
+Stable tag: 0.8.0
 Requires PHP: 7.4
 WC requires at least: 7.0
 WC tested up to: 8.9
@@ -108,3 +108,20 @@ Zymarg Product Builder gives Elementor users a set of WooCommerce widgets that s
 * Reset all overrides for a product with a single checkbox + confirm dialog
 * HPOS-compatible save handler (uses woocommerce_admin_process_product_object)
 * Resolution chain: per-product override -> global setting -> hard-coded default
+
+
+= 0.8.0 =
+* New: full support for grouped products in the Add to Cart widget — renders a table of children with individual quantity inputs
+* New: full support for external / affiliate products — single button linking to the external URL with appropriate rel attributes
+* New: backorder notice — "Available on backorder" message with admin-configurable text
+* New: low-stock warning — "Only N left" with admin-configurable threshold and message template
+* New: URL parameter sync on the Variation Swatches widget (opt-in toggle) — selections survive page refresh + browser back/forward
+* Accessibility: screen-reader live region announces variation selections + stock status
+* Accessibility: prefers-reduced-motion respected across all widgets
+* Accessibility: 44x44 minimum touch targets on coarse-pointer / no-hover devices
+* Mobile: hover-zoom on the gallery automatically becomes tap-to-zoom on touch devices
+* Mobile: iOS safe-area insets honored in the gallery lightbox
+* UX: success animation styles now actually implemented (Restore / Stay / Checkmark) — driven by Settings -> General
+* UX: Add to Cart errors now distinguish network / server / validation failures with a Try Again retry link
+* UX: cross-fade transition on gallery main-image swap (instant on reduced-motion)
+* UX: skeleton placeholder shimmer for gallery thumbnails while images load

@@ -57,6 +57,21 @@ if ( class_exists( '\Zymarg\ProductBuilder\Product_Overrides' ) ) {
 $hide_button  = ! $is_in_stock && 'hide' === $oos_behavior;
 $show_oos_msg = ! $is_in_stock && 'message' === $oos_behavior;
 
+// Phase 9: backorder + low-stock messaging (admin-configurable global).
+$show_backorder_notice = 'yes' === Settings_Store::get( 'add_to_cart.show_backorder_notice', 'yes' );
+$backorder_text        = (string) Settings_Store::get( 'add_to_cart.backorder_text', __( 'Available on backorder', 'zymarg-product-builder' ) );
+$show_low_stock        = 'yes' === Settings_Store::get( 'add_to_cart.show_low_stock', 'yes' );
+$low_stock_threshold   = (int) Settings_Store::get( 'add_to_cart.low_stock_threshold', 3 );
+$low_stock_template    = (string) Settings_Store::get( 'add_to_cart.low_stock_text', __( 'Only %s left in stock', 'zymarg-product-builder' ) );
+
+$is_backordered    = $show_backorder_notice && $product->is_on_backorder();
+$current_stock_qty = $product->get_stock_quantity();
+$is_low_stock      = $show_low_stock
+	&& $is_in_stock
+	&& null !== $current_stock_qty
+	&& $current_stock_qty > 0
+	&& $current_stock_qty <= $low_stock_threshold;
+
 // Stock label.
 $stock_text  = $is_in_stock ? __( 'In Stock', 'zymarg-product-builder' ) : $oos_text;
 $stock_class = $is_in_stock ? 'is-in-stock' : 'is-out-of-stock';
@@ -66,11 +81,24 @@ $stock_class = $is_in_stock ? 'is-in-stock' : 'is-out-of-stock';
 	data-product-type="<?php echo esc_attr( $product->get_type() ); ?>"
 	data-use-ajax="<?php echo $use_ajax ? '1' : '0'; ?>"
 	data-redirect="<?php echo esc_attr( $redirect_after ); ?>"
-	data-redirect-url="<?php echo esc_attr( $redirect_url_value ); ?>">
+	data-redirect-url="<?php echo esc_attr( $redirect_url_value ); ?>"
+	data-success-behavior="<?php echo esc_attr( Settings_Store::get( 'general.success_behavior', 'restore' ) ); ?>">
 
 	<?php if ( $show_stock ) : ?>
 		<div class="zpb-atc__stock <?php echo esc_attr( $stock_class ); ?>" data-zpb-stock>
 			<?php echo esc_html( $stock_text ); ?>
+		</div>
+	<?php endif; ?>
+
+	<?php if ( $is_low_stock ) : ?>
+		<div class="zpb-atc__low-stock" role="status" data-zpb-low-stock>
+			<?php echo esc_html( sprintf( $low_stock_template, $current_stock_qty ) ); ?>
+		</div>
+	<?php endif; ?>
+
+	<?php if ( $is_backordered ) : ?>
+		<div class="zpb-atc__backorder" role="status" data-zpb-backorder>
+			<?php echo esc_html( $backorder_text ); ?>
 		</div>
 	<?php endif; ?>
 

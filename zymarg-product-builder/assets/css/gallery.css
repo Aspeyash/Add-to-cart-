@@ -340,3 +340,74 @@ body.zpb-lightbox-open { overflow: hidden; }
 	height: 100%;
 	object-fit: contain;
 }
+
+
+
+/* ============================================================
+ * Phase 9 — fade transitions, skeleton placeholders, mobile polish
+ * ============================================================ */
+
+/* Cross-fade for variation / thumb-driven main image swap. */
+.zpb-gallery__main-img {
+	transition: opacity 0.22s ease, transform 0.18s ease;
+}
+
+.zpb-gallery__main-img.is-fading {
+	opacity: 0.2;
+}
+
+/* Skeleton state for thumbs while images are loading. */
+.zpb-gallery__thumb img {
+	background:
+		linear-gradient(
+			90deg,
+			#f0f0f1 0%,
+			#fafafa 50%,
+			#f0f0f1 100%
+		);
+	background-size: 200% 100%;
+	animation: zpb-skeleton 1.4s ease-in-out infinite;
+}
+.zpb-gallery__thumb img[src] {
+	animation: none;
+	background: transparent;
+}
+
+@keyframes zpb-skeleton {
+	0%   { background-position: 100% 0; }
+	100% { background-position: -100% 0; }
+}
+
+/* Lightbox cross-fade between images. */
+.zpb-lightbox__img {
+	transition: opacity 0.18s ease;
+}
+
+/* Touch device tap-to-zoom state. */
+.zpb-gallery__main-frame.is-zoomed {
+	cursor: zoom-out;
+}
+
+@media ( hover: none ) and ( pointer: coarse ) {
+	/* Mobile: hide hover-arrows, keep tap-zoom; thumbs flow horizontally. */
+	.zpb-gallery__nav { opacity: 1; }
+	.zpb-gallery__thumb { min-width: 56px; min-height: 56px; touch-action: manipulation; }
+}
+
+/* iOS safe area inside lightbox. */
+.zpb-lightbox {
+	padding-top:    max( 24px, env(safe-area-inset-top) );
+	padding-bottom: max( 24px, env(safe-area-inset-bottom) );
+	padding-left:   max( 24px, env(safe-area-inset-left) );
+	padding-right:  max( 24px, env(safe-area-inset-right) );
+}
+
+@media ( prefers-reduced-motion: reduce ) {
+	.zpb-gallery__main-img,
+	.zpb-gallery__thumb img,
+	.zpb-lightbox,
+	.zpb-lightbox__img {
+		transition: none !important;
+		animation: none !important;
+	}
+}

@@ -227,42 +227,94 @@
 		if ( thumb && this.mainImg ) {
 			var src  = thumb.getAttribute( 'data-image' );
 			var full = thumb.getAttribute( 'data-full' ) || src;
-			this.mainImg.setAttribute( 'src', src );
-			this.mainImg.setAttribute( 'data-full', full );
+			this.swapMainImage( src, full );
 		}
 	};
 
 	/** Swap main image to an arbitrary URL (variation image). */
 	GalleryInstance.prototype.applyExternalImage = function ( url ) {
 		if ( ! this.mainImg ) return;
-		this.mainImg.setAttribute( 'src', url );
-		this.mainImg.setAttribute( 'data-full', url );
+		this.swapMainImage( url, url );
 		this.thumbs.forEach( function ( t ) {
 			t.classList.remove( 'is-active' );
 			t.setAttribute( 'aria-current', 'false' );
 		} );
 	};
 
-	/** CSS-driven zoom on hover. */
+	/**
+	 * Cross-fade the main image to a new src.
+	 * Falls back to instant swap if `prefers-reduced-motion: reduce`.
+	 */
+	GalleryInstance.prototype.swapMainImage = function ( src, full ) {
+		if ( ! this.mainImg ) return;
+		if ( this.mainImg.getAttribute( 'src' ) === src ) {
+			this.mainImg.setAttribute( 'data-full', full );
+			return;
+		}
+		var reduced = window.matchMedia && window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
+		if ( reduced ) {
+			this.mainImg.setAttribute( 'src', src );
+			this.mainImg.setAttribute( 'data-full', full );
+			return;
+		}
+		var img = this.mainImg;
+		img.classList.add( 'is-fading' );
+		// Preload, then swap on load.
+		var pre = new Image();
+		pre.onload = function () {
+			img.setAttribute( 'src', src );
+			img.setAttribute( 'data-full', full );
+			img.classList.remove( 'is-fading' );
+		};
+		pre.onerror = function () {
+			// Fall back to direct swap on load failure.
+			img.setAttribute( 'src', src );
+			img.classList.remove( 'is-fading' );
+		};
+		pre.src = src;
+	};
+
+	/** CSS-driven zoom on hover (desktop) or tap-to-toggle (touch devices). */
 	GalleryInstance.prototype.bindZoom = function () {
 		var self = this;
 		var frame = this.root.querySelector( '.zpb-gallery__main-frame' );
 		if ( ! frame || ! this.mainImg ) return;
 
+		// Detect coarse pointer / no-hover (touch devices).
+		var isTouch = window.matchMedia &&
+			( window.matchMedia( '(hover: none)' ).matches || window.matchMedia( '(pointer: coarse)' ).matches );
+
 		frame.classList.add( 'is-zoomable' );
 
-		frame.addEventListener( 'mousemove', function ( e ) {
-			var rect = frame.getBoundingClientRect();
-			var x = ( ( e.clientX - rect.left ) / rect.width ) * 100;
-			var y = ( ( e.clientY - rect.top ) / rect.height ) * 100;
-			self.mainImg.style.transformOrigin = x + '% ' + y + '%';
-			self.mainImg.style.transform = 'scale(' + self.zoomLevel + ')';
-		} );
+		if ( isTouch ) {
+			// Tap to toggle zoom; second tap or click anywhere else collapses.
+			frame.addEventListener( 'click', function ( e ) {
+				if ( self.lightboxEnabled ) {
+					// Lightbox handler will run too — only toggle zoom if not lightboxable.
+					return;
+				}
+				e.preventDefault();
+				if ( frame.classList.toggle( 'is-zoomed' ) ) {
+					self.mainImg.style.transform = 'scale(' + self.zoomLevel + ')';
+				} else {
+					self.mainImg.style.transform = '';
+					self.mainImg.style.transformOrigin = '';
+				}
+			} );
+		} else {
+			frame.addEventListener( 'mousemove', function ( e ) {
+				var rect = frame.getBoundingClientRect();
+				var x = ( ( e.clientX - rect.left ) / rect.width ) * 100;
+				var y = ( ( e.clientY - rect.top ) / rect.height ) * 100;
+				self.mainImg.style.transformOrigin = x + '% ' + y + '%';
+				self.mainImg.style.transform = 'scale(' + self.zoomLevel + ')';
+			} );
 
-		frame.addEventListener( 'mouseleave', function () {
-			self.mainImg.style.transform = '';
-			self.mainImg.style.transformOrigin = '';
-		} );
+			frame.addEventListener( 'mouseleave', function () {
+				self.mainImg.style.transform = '';
+				self.mainImg.style.transformOrigin = '';
+			} );
+		}
 	};
 
 	/** Open lightbox on main-image click. */

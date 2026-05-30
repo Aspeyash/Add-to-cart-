@@ -422,6 +422,37 @@ final class Settings {
 						'description' => __( 'Pull min/max quantity from the WooCommerce product settings.', 'zymarg-product-builder' ),
 						'default'     => $defaults['add_to_cart']['use_product_min_max'],
 					),
+					'show_low_stock'        => array(
+						'type'        => 'toggle',
+						'label'       => __( 'Show "Only N left" Warning', 'zymarg-product-builder' ),
+						'description' => __( 'Display a low-stock warning when stock drops to or below the threshold.', 'zymarg-product-builder' ),
+						'default'     => $defaults['add_to_cart']['show_low_stock'],
+					),
+					'low_stock_threshold'   => array(
+						'type'        => 'number',
+						'label'       => __( 'Low Stock Threshold', 'zymarg-product-builder' ),
+						'description' => __( 'Show the low-stock warning when stock is at or below this number.', 'zymarg-product-builder' ),
+						'min'         => 1,
+						'max'         => 999,
+						'default'     => $defaults['add_to_cart']['low_stock_threshold'],
+					),
+					'low_stock_text'        => array(
+						'type'        => 'text',
+						'label'       => __( 'Low Stock Message', 'zymarg-product-builder' ),
+						'description' => __( 'Use %s as a placeholder for the remaining quantity.', 'zymarg-product-builder' ),
+						'default'     => $defaults['add_to_cart']['low_stock_text'],
+					),
+					'show_backorder_notice' => array(
+						'type'        => 'toggle',
+						'label'       => __( 'Show Backorder Notice', 'zymarg-product-builder' ),
+						'description' => __( 'Display "Available on backorder" when product allows backorders and is out of stock.', 'zymarg-product-builder' ),
+						'default'     => $defaults['add_to_cart']['show_backorder_notice'],
+					),
+					'backorder_text'        => array(
+						'type'        => 'text',
+						'label'       => __( 'Backorder Message', 'zymarg-product-builder' ),
+						'default'     => $defaults['add_to_cart']['backorder_text'],
+					),
 				),
 			),
 
