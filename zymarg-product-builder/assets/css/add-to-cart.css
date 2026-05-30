@@ -1,0 +1,197 @@
+/**
+ * Zymarg Product Builder — Add to Cart styles.
+ * Scoped to .zpb-atc; intentionally minimal so Elementor controls drive the look.
+ */
+
+.zpb-atc {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	box-sizing: border-box;
+	width: 100%;
+	font-family: inherit;
+}
+
+.zpb-atc *,
+.zpb-atc *::before,
+.zpb-atc *::after {
+	box-sizing: border-box;
+}
+
+/* Notice / messages */
+.zpb-atc__notice {
+	margin: 0;
+	padding: 8px 12px;
+	background: #f5f5f5;
+	color: #555;
+	border-radius: 4px;
+	font-size: 0.9em;
+}
+
+.zpb-atc__message {
+	min-height: 1.2em;
+	font-size: 0.9em;
+	line-height: 1.4;
+}
+.zpb-atc__message.is-error   { color: #c92a2a; }
+.zpb-atc__message.is-success { color: #1f9d55; }
+
+/* Stock + price */
+.zpb-atc__stock {
+	font-weight: 600;
+	font-size: 0.95em;
+}
+.zpb-atc__stock.is-in-stock     { color: #1f9d55; }
+.zpb-atc__stock.is-out-of-stock { color: #c92a2a; }
+
+.zpb-atc__price {
+	font-size: 1.25em;
+	font-weight: 600;
+	line-height: 1.2;
+}
+.zpb-atc__price del { opacity: 0.6; margin-inline-end: 6px; }
+
+/* Quantity stepper */
+.zpb-atc__qty-wrap {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.zpb-atc__qty-label {
+	font-size: 0.9em;
+	font-weight: 500;
+	color: #333;
+}
+
+.zpb-atc__qty {
+	display: inline-flex;
+	align-items: stretch;
+	border: 1px solid #d0d0d0;
+	border-radius: 4px;
+	overflow: hidden;
+	width: max-content;
+	height: 44px;
+	background: #fff;
+}
+
+.zpb-atc__qty-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	border: 0;
+	background: transparent;
+	cursor: pointer;
+	font-size: 1.1em;
+	line-height: 1;
+	color: inherit;
+	user-select: none;
+	transition: background-color 0.15s ease;
+}
+.zpb-atc__qty-btn:hover { background-color: rgba(0, 0, 0, 0.04); }
+.zpb-atc__qty-btn:focus-visible { outline: 2px solid #2271b1; outline-offset: -2px; }
+
+.zpb-atc__qty-input {
+	width: 60px;
+	border: 0;
+	border-left: 1px solid #d0d0d0;
+	border-right: 1px solid #d0d0d0;
+	text-align: center;
+	font-size: 1em;
+	background: transparent;
+	-moz-appearance: textfield;
+	color: inherit;
+}
+.zpb-atc__qty-input::-webkit-outer-spin-button,
+.zpb-atc__qty-input::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+.zpb-atc__qty-input:focus { outline: none; }
+
+/* Buttons row */
+.zpb-atc__buttons {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	width: 100%;
+}
+
+.zpb-atc__btn,
+.zpb-atc__buy-now {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0;
+	padding: 12px 24px;
+	border: 0;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 1em;
+	font-weight: 600;
+	line-height: 1.2;
+	text-decoration: none;
+	background: #2271b1;
+	color: #ffffff;
+	transition: background-color 0.18s ease, transform 0.12s ease, opacity 0.18s ease;
+	position: relative;
+}
+
+.zpb-atc__btn:hover,
+.zpb-atc__buy-now:hover {
+	background-color: #135e96;
+}
+
+.zpb-atc__buy-now {
+	background: #f59f00;
+}
+.zpb-atc__buy-now:hover { background-color: #d98e00; }
+
+.zpb-atc__btn:disabled,
+.zpb-atc__buy-now:disabled {
+	opacity: 0.55;
+	cursor: not-allowed;
+}
+
+.zpb-atc__btn:focus-visible,
+.zpb-atc__buy-now:focus-visible {
+	outline: 3px solid rgba(34, 113, 177, 0.45);
+	outline-offset: 2px;
+}
+
+/* Icon spacing */
+.zpb-icon { display: inline-flex; }
+.zpb-icon svg, .zpb-icon i { width: 1em; height: 1em; }
+
+/* Loading state */
+.zpb-spinner {
+	display: none;
+	width: 16px;
+	height: 16px;
+	margin-inline-start: 8px;
+	border: 2px solid rgba(255, 255, 255, 0.4);
+	border-top-color: #ffffff;
+	border-radius: 50%;
+	animation: zpb-spin 0.7s linear infinite;
+}
+
+.zpb-atc__btn.is-loading .zpb-spinner { display: inline-block; }
+.zpb-atc__btn.is-loading { pointer-events: none; }
+
+.zpb-atc__btn.is-success {
+	background-color: #1f9d55;
+}
+
+@keyframes zpb-spin {
+	to { transform: rotate(360deg); }
+}
+
+/* Placeholder & unsupported states */
+.zpb-atc--placeholder,
+.zpb-atc--unsupported {
+	opacity: 0.85;
+}
+
+/* RTL: margin-inline already handles, but explicit override safety */
+[dir="rtl"] .zpb-spinner { margin-inline-start: 8px; }
