@@ -4,6 +4,16 @@ Connected Elementor widgets for WooCommerce — Product Gallery, Variation Swatc
 
 The actual WordPress plugin lives in [`zymarg-product-builder/`](./zymarg-product-builder/).
 
+## Documentation
+
+- [Getting Started](./docs/getting-started.md) — 5-minute setup
+- [Creating Swatches](./docs/creating-swatches.md) — full swatch configuration walkthrough
+- [Using the Widgets](./docs/using-the-widgets.md) — control reference for all 3 widgets
+- [Per-Product Overrides](./docs/per-product-overrides.md) — Phase 8 features
+- [Troubleshooting](./docs/troubleshooting.md) — common issues
+- [Releasing a New Version](./docs/releasing.md) — auto-update workflow
+- [QA Checklist](./docs/qa-checklist.md) — pre-release smoke test matrix
+
 ## Roadmap
 
 | Phase | Status | Deliverable |
@@ -15,9 +25,10 @@ The actual WordPress plugin lives in [`zymarg-product-builder/`](./zymarg-produc
 | 5 | done | Admin: Attribute term meta (color picker, image upload, swatch type config) |
 | 6 | done | **Variation Swatches widget** + cross-section sync + smart-greying |
 | 7 | done | **Product Gallery widget** + variation image swap + custom lightbox |
+| GitHub auto-updater | done | Strict version-aware GitHub Releases integration |
 | 8 | done | Per-product override meta box (display type, hide attributes, ATC overrides, widget disable) |
 | 9 | done | Polish: a11y, URL param sync, grouped/external products, low-stock + backorder, animations, mobile |
-| 10 | next | Translations, screenshots, release |
+| 10 | done | **v1.0.0**: full-resolution gallery option, translations (.pot), plugin icons + banner, expanded readme.txt, docs/ directory, QA checklist |
 
 ## Architecture
 
@@ -37,12 +48,6 @@ Each widget declares its product source (current product or manual pick), gets t
 * Elementor 3.5+ (free version)
 * PHP 7.4+
 
-## License
-
-GPL-2.0-or-later
-
----
-
 ## Releasing a new version (auto-update workflow)
 
 The plugin includes a GitHub-based auto-updater. Once the current release is installed, every WordPress site running the plugin will see new versions under **Dashboard → Updates** automatically.
@@ -56,8 +61,8 @@ The plugin includes a GitHub-based auto-updater. Once the current release is ins
 3. Commit the version bump
 4. Tag the commit and push the tag:
    ```bash
-   git tag v0.6.1
-   git push origin v0.6.1
+   git tag v1.0.1
+   git push origin v1.0.1
    ```
 5. The included GitHub Action (`.github/workflows/release.yml`) automatically:
    - Verifies the plugin's `Version:` header matches the tag (fails the build if not)
@@ -67,7 +72,8 @@ The plugin includes a GitHub-based auto-updater. Once the current release is ins
 
 Within 12 hours every WP site will see the update notification (or the site owner can click **Plugins → Zymarg Product Builder → Check for Updates** for an instant check).
 
-### Version rules
-- Tags must be `vX.Y.Z` or `X.Y.Z` (e.g. `v0.6.1`, `1.0.0`)
-- The plugin only offers an update when the tag's version is **strictly greater** than the installed version (per PHP `version_compare`)
-- Pre-release / draft GitHub releases are ignored — only the `/releases/latest` tag is considered
+For the full release walkthrough including pre-releases, rollback, and forking guidance, see [docs/releasing.md](./docs/releasing.md).
+
+## License
+
+GPL-2.0-or-later
