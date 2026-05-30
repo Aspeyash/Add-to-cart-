@@ -3,7 +3,7 @@ Contributors: zymarg
 Tags: woocommerce, elementor, add to cart, variation swatches, product gallery
 Requires at least: 6.0
 Tested up to: 6.5
-Stable tag: 0.3.0
+Stable tag: 0.4.0
 Requires PHP: 7.4
 WC requires at least: 7.0
 WC tested up to: 8.9
@@ -64,3 +64,14 @@ Zymarg Product Builder gives Elementor users a set of WooCommerce widgets that s
 * New helper API: Attribute_Settings::get_type(), Term_Meta::get_swatch(), Term_Meta::get_color(), Term_Meta::get_image_url()
 * Conflict detection: warning notice if another swatches plugin is detected
 * Split-color (two-tone) swatch support for color attributes
+
+
+= 0.4.0 =
+* New: Variation Swatches Elementor widget
+* Renders one block per variation attribute with the type configured in the Swatches admin (Color / Image / Label / Button / Default Dropdown)
+* Cross-section sync via the page-global state bus: select a swatch, the Add to Cart widget in another Elementor section instantly updates price, stock, button state, and qty min/max
+* Smart-greying: combinations that don't match any variation are visually disabled
+* Per-attribute display override on the widget instance (Inherit / Color / Image / Label / Button)
+* Toggles for: show attribute label, show selected value, show colon, show price per swatch, show reset link, auto-select first available variation
+* Full keyboard support: arrow keys + Enter/Space within radiogroup, ARIA roles and aria-checked
+* Themes can override templates by copying templates/swatches/* into yourtheme/zymarg-product-builder/swatches/

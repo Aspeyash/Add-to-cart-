@@ -24,6 +24,12 @@ final class Assets {
 	/** Handle for Add to Cart widget CSS. */
 	const HANDLE_ADD_TO_CART_CSS = 'zpb-add-to-cart';
 
+	/** Handle for Variation Swatches widget JS. */
+	const HANDLE_SWATCHES_JS = 'zpb-swatches';
+
+	/** Handle for Variation Swatches widget CSS. */
+	const HANDLE_SWATCHES_CSS = 'zpb-swatches';
+
 	/**
 	 * Singleton instance.
 	 *
@@ -98,6 +104,22 @@ final class Assets {
 			array(),
 			ZPB_VERSION
 		);
+
+		// Variation Swatches widget assets.
+		wp_register_script(
+			self::HANDLE_SWATCHES_JS,
+			ZPB_ASSETS_URL . 'js/swatches.js',
+			array( self::HANDLE_STATE ),
+			ZPB_VERSION,
+			true
+		);
+
+		wp_register_style(
+			self::HANDLE_SWATCHES_CSS,
+			ZPB_ASSETS_URL . 'css/swatches.css',
+			array(),
+			ZPB_VERSION
+		);
 	}
 
 	/**
@@ -110,6 +132,12 @@ final class Assets {
 			array(),
 			ZPB_VERSION
 		);
+		wp_enqueue_style(
+			'zpb-editor-swatches',
+			ZPB_ASSETS_URL . 'css/swatches.css',
+			array(),
+			ZPB_VERSION
+		);
 	}
 
 	/**
@@ -119,5 +147,14 @@ final class Assets {
 		wp_enqueue_style( self::HANDLE_ADD_TO_CART_CSS );
 		wp_enqueue_script( self::HANDLE_STATE );
 		wp_enqueue_script( self::HANDLE_ADD_TO_CART_JS );
+	}
+
+	/**
+	 * Enqueue everything needed for the Variation Swatches widget.
+	 */
+	public static function enqueue_swatches() {
+		wp_enqueue_style( self::HANDLE_SWATCHES_CSS );
+		wp_enqueue_script( self::HANDLE_STATE );
+		wp_enqueue_script( self::HANDLE_SWATCHES_JS );
 	}
 }
