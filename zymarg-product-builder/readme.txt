@@ -3,7 +3,7 @@ Contributors: zymarg
 Tags: woocommerce, elementor, add to cart, variation swatches, product gallery
 Requires at least: 6.0
 Tested up to: 6.5
-Stable tag: 0.4.0
+Stable tag: 0.5.0
 Requires PHP: 7.4
 WC requires at least: 7.0
 WC tested up to: 8.9
@@ -75,3 +75,16 @@ Zymarg Product Builder gives Elementor users a set of WooCommerce widgets that s
 * Toggles for: show attribute label, show selected value, show colon, show price per swatch, show reset link, auto-select first available variation
 * Full keyboard support: arrow keys + Enter/Space within radiogroup, ARIA roles and aria-checked
 * Themes can override templates by copying templates/swatches/* into yourtheme/zymarg-product-builder/swatches/
+
+
+= 0.5.0 =
+* New: Product Gallery Elementor widget with main image + thumbnails
+* Three layouts: Vertical thumbs (left), Vertical thumbs (right), Horizontal thumbs
+* Mobile responsive: vertical layouts auto-collapse below 768px
+* Hover zoom (configurable level 1.2x to 4x) using CSS transform-origin tracking
+* Custom built-in lightbox: keyboard navigation (Esc, Arrow keys), focus trap, click backdrop to close, image counter, no external library required
+* Cross-section sync: listens for variation:selected on the state bus and swaps the main image to the variation image; reverts to featured on variation:cleared
+* Sale, Out of Stock, and Featured badges with positioning + per-badge color controls
+* Aspect ratio control: auto, 1:1, 4:3, 3:4, 16:9
+* Featured-image-first toggle
+* Configurable navigation arrows (visible on hover)

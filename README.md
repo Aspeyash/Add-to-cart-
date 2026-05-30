@@ -14,7 +14,7 @@ The actual WordPress plugin lives in [`zymarg-product-builder/`](./zymarg-produc
 | 4 | done | Admin: Global settings page (General + Add to Cart defaults) |
 | 5 | done | Admin: Attribute term meta (color picker, image upload, swatch type config) |
 | 6 | done | **Variation Swatches widget** + cross-section sync + smart-greying |
-| 7 | next | **Product Gallery widget** + variation image swap |
+| 7 | done | **Product Gallery widget** + variation image swap + custom lightbox |
 | 8 | next | Admin: Per-product override meta box |
 | 9 | next | Polish: accessibility, mobile, animations, edge cases |
 | 10 | next | Translations, screenshots, release |

@@ -119,5 +119,8 @@ final class Plugin {
 
 		require_once ZPB_PLUGIN_DIR . 'includes/widgets/class-swatches-widget.php';
 		$widgets_manager->register( new Widgets\Swatches_Widget() );
+
+		require_once ZPB_PLUGIN_DIR . 'includes/widgets/class-gallery-widget.php';
+		$widgets_manager->register( new Widgets\Gallery_Widget() );
 	}
 }
