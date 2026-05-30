@@ -116,5 +116,8 @@ final class Plugin {
 	public function register_widgets( $widgets_manager ) {
 		require_once ZPB_PLUGIN_DIR . 'includes/widgets/class-add-to-cart-widget.php';
 		$widgets_manager->register( new Widgets\Add_To_Cart_Widget() );
+
+		require_once ZPB_PLUGIN_DIR . 'includes/widgets/class-swatches-widget.php';
+		$widgets_manager->register( new Widgets\Swatches_Widget() );
 	}
 }

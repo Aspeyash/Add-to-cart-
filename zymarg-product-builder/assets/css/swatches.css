@@ -1,0 +1,246 @@
+/**
+ * Zymarg Product Builder — Variation Swatches widget.
+ * Scoped to .zpb-swatches; intentionally low-specificity so Elementor
+ * controls drive the look.
+ */
+
+.zpb-swatches {
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+	font-family: inherit;
+	box-sizing: border-box;
+	width: 100%;
+}
+
+.zpb-swatches *,
+.zpb-swatches *::before,
+.zpb-swatches *::after {
+	box-sizing: border-box;
+}
+
+/* Per-attribute group */
+.zpb-swatches__attr {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.zpb-swatches__label {
+	display: flex;
+	align-items: baseline;
+	flex-wrap: wrap;
+	gap: 6px;
+	font-size: 0.95em;
+	line-height: 1.4;
+}
+
+.zpb-swatches__attr-name {
+	font-weight: 600;
+	color: #2c3338;
+}
+
+.zpb-swatches__attr-value {
+	color: #50575e;
+}
+
+.zpb-swatches__attr-value:empty::before {
+	content: "";
+}
+
+/* Swatch list */
+.zpb-swatches__list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: stretch;
+}
+
+/* Generic swatch button */
+.zpb-swatch {
+	display: inline-flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 4px;
+	border: 2px solid #d0d0d0;
+	background: transparent;
+	cursor: pointer;
+	padding: 0;
+	font: inherit;
+	color: inherit;
+	border-radius: 6px;
+	transition: border-color 0.15s ease, transform 0.12s ease, opacity 0.18s ease, background-color 0.15s ease;
+	position: relative;
+	user-select: none;
+}
+
+.zpb-swatch:focus-visible {
+	outline: 3px solid rgba(34, 113, 177, 0.45);
+	outline-offset: 2px;
+}
+
+.zpb-swatch:hover:not(.is-disabled):not(.is-active) {
+	border-color: #999;
+	transform: translateY(-1px);
+}
+
+.zpb-swatch.is-active {
+	border-color: #2271b1;
+	box-shadow: 0 0 0 1px #2271b1 inset;
+}
+
+.zpb-swatch.is-disabled {
+	opacity: 0.45;
+	cursor: not-allowed;
+	pointer-events: auto; /* allow focus + tooltip; click handler bails */
+}
+
+.zpb-swatch.is-disabled .zpb-swatch__visual {
+	position: relative;
+}
+
+.zpb-swatch.is-disabled .zpb-swatch__visual::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background-image: linear-gradient(to top right, transparent calc(50% - 1px), rgba(180, 50, 50, 0.7) 50%, transparent calc(50% + 1px));
+	pointer-events: none;
+}
+
+.zpb-swatch.is-out-of-stock {
+	opacity: 0.7;
+}
+
+/* Color swatches */
+.zpb-swatch--color {
+	width: 44px;
+	height: 44px;
+}
+
+.zpb-swatch--color .zpb-swatch__visual {
+	display: block;
+	width: 100%;
+	height: 100%;
+	border-radius: inherit;
+	background-color: var( --zpb-color, #cccccc );
+}
+
+.zpb-swatch--color .zpb-swatch__visual--split {
+	background: linear-gradient(
+		135deg,
+		var( --zpb-color, #cccccc ) 0%,
+		var( --zpb-color, #cccccc ) 50%,
+		var( --zpb-color-2, #999999 ) 50%,
+		var( --zpb-color-2, #999999 ) 100%
+	);
+}
+
+/* Empty color (no value set) — checker pattern */
+.zpb-swatch--color .zpb-swatch__visual--empty {
+	background:
+		linear-gradient(45deg, #e2e2e3 25%, transparent 25%),
+		linear-gradient(-45deg, #e2e2e3 25%, transparent 25%),
+		linear-gradient(45deg, transparent 75%, #e2e2e3 75%),
+		linear-gradient(-45deg, transparent 75%, #e2e2e3 75%);
+	background-size: 8px 8px;
+	background-position: 0 0, 0 4px, 4px -4px, -4px 0;
+	background-color: #f0f0f1;
+}
+
+/* Image swatches */
+.zpb-swatch--image {
+	width: 56px;
+	height: 56px;
+	overflow: hidden;
+}
+
+.zpb-swatch--image img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	border-radius: inherit;
+}
+
+/* Label / Button swatches */
+.zpb-swatch--label,
+.zpb-swatch--button {
+	min-width: 48px;
+	height: 40px;
+	padding: 0 14px;
+	font-size: 0.95em;
+	font-weight: 500;
+	background: #ffffff;
+	color: #2c3338;
+}
+
+.zpb-swatch--label.is-active,
+.zpb-swatch--button.is-active {
+	background: #f5faff;
+}
+
+.zpb-swatch--button {
+	border-radius: 4px;
+}
+
+/* Per-swatch price */
+.zpb-swatch__price {
+	font-size: 0.78em;
+	color: #50575e;
+	line-height: 1.2;
+	margin-top: 2px;
+}
+
+/* Native dropdown fallback */
+.zpb-swatches__dropdown {
+	min-width: 160px;
+	padding: 8px 12px;
+	border: 1px solid #d0d0d0;
+	border-radius: 4px;
+	font: inherit;
+	background-color: #ffffff;
+}
+
+/* Reset link */
+.zpb-swatches__reset {
+	align-self: flex-start;
+	border: 0;
+	background: transparent;
+	padding: 4px 0;
+	color: #2271b1;
+	cursor: pointer;
+	font-size: 0.9em;
+	text-decoration: underline;
+}
+
+.zpb-swatches__reset:hover { color: #135e96; }
+
+/* Tooltip on hover */
+.zpb-swatch[data-tooltip]:hover::before,
+.zpb-swatch[data-tooltip]:focus-visible::before {
+	content: attr( data-tooltip );
+	position: absolute;
+	bottom: calc( 100% + 8px );
+	left: 50%;
+	transform: translateX( -50% );
+	background: #2c3338;
+	color: #ffffff;
+	font-size: 12px;
+	line-height: 1.2;
+	padding: 4px 8px;
+	border-radius: 3px;
+	white-space: nowrap;
+	pointer-events: none;
+	z-index: 5;
+}
+
+/* Editor / unsupported state */
+.zpb-swatches--placeholder,
+.zpb-swatches--unsupported {
+	padding: 14px 18px;
+	background: #f5f5f5;
+	color: #555;
+	border-radius: 4px;
+	border: 1px dashed #d0d0d0;
+}
