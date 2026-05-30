@@ -63,7 +63,10 @@ final class Product_Context {
 	}
 
 	/**
-	 * Whether the product type is supported in v1 (simple + variable).
+	 * Whether the product type is supported by the Add to Cart widget.
+	 *
+	 * Phase 9 added grouped + external. Subscriptions / bundles still
+	 * fall through to the unsupported notice.
 	 *
 	 * @param \WC_Product $product Product.
 	 * @return bool
@@ -73,6 +76,6 @@ final class Product_Context {
 			return false;
 		}
 		$type = $product->get_type();
-		return in_array( $type, array( 'simple', 'variable' ), true );
+		return in_array( $type, array( 'simple', 'variable', 'grouped', 'external' ), true );
 	}
 }

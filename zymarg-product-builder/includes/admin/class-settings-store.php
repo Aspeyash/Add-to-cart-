@@ -58,6 +58,13 @@ final class Settings_Store {
 				'out_of_stock_behavior' => 'disable',
 				'out_of_stock_text'     => __( 'Out of Stock', 'zymarg-product-builder' ),
 				'use_product_min_max'   => 'yes',
+				// Phase 9.
+				'show_low_stock'        => 'yes',
+				'low_stock_threshold'   => 3,
+				'low_stock_text'        => __( 'Only %s left in stock', 'zymarg-product-builder' ),
+				'show_backorder_notice' => 'yes',
+				'backorder_text'        => __( 'Available on backorder', 'zymarg-product-builder' ),
+				'external_button_default_text' => __( 'Buy Product', 'zymarg-product-builder' ),
 			),
 		);
 	}

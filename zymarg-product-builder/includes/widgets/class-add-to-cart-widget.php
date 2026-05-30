@@ -747,7 +747,16 @@ class Add_To_Cart_Widget extends Widget_Base {
 			'product'  => $product,
 		);
 
-		$template = ZPB_TEMPLATES_DIR . 'add-to-cart/add-to-cart.php';
+		// Pick the right template based on product type.
+		$type = $product->get_type();
+		if ( 'grouped' === $type ) {
+			$template = ZPB_TEMPLATES_DIR . 'add-to-cart/_grouped.php';
+		} elseif ( 'external' === $type ) {
+			$template = ZPB_TEMPLATES_DIR . 'add-to-cart/_external.php';
+		} else {
+			$template = ZPB_TEMPLATES_DIR . 'add-to-cart/add-to-cart.php';
+		}
+
 		if ( file_exists( $template ) ) {
 			extract( $context, EXTR_SKIP ); // phpcs:ignore WordPress.PHP.DontExtract.extract_extract
 			include $template;

@@ -31,6 +31,7 @@ $show_price    = ! empty( $settings['show_per_swatch_price'] ) && 'yes' === $set
 $show_reset    = ! empty( $settings['show_reset'] ) && 'yes' === $settings['show_reset'];
 $reset_text    = ! empty( $settings['reset_text'] ) ? $settings['reset_text'] : __( 'Reset selection', 'zymarg-product-builder' );
 $auto_first    = ! empty( $settings['auto_select_first'] ) && 'yes' === $settings['auto_select_first'];
+$url_sync      = ! empty( $settings['enable_url_sync'] ) && 'yes' === $settings['enable_url_sync'];
 
 // Per-product hidden attributes — auto-resolve sensible defaults so cart
 // submission still picks a real variation.
@@ -65,7 +66,11 @@ if ( $show_price ) {
 <div class="zpb-swatches"
 	data-product-id="<?php echo esc_attr( $product->get_id() ); ?>"
 	data-product-type="<?php echo esc_attr( $product->get_type() ); ?>"
-	data-auto-select-first="<?php echo $auto_first ? '1' : '0'; ?>">
+	data-auto-select-first="<?php echo $auto_first ? '1' : '0'; ?>"
+	data-url-sync="<?php echo $url_sync ? '1' : '0'; ?>">
+
+	<?php /* Single SR live region for the whole widget — variation announcements. */ ?>
+	<div class="zpb-sr-only" role="status" aria-live="polite" aria-atomic="true" data-zpb-sr-status></div>
 
 	<?php
 	foreach ( $variation_attributes as $attribute_name => $options ) :

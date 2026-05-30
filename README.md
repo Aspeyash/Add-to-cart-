@@ -16,7 +16,7 @@ The actual WordPress plugin lives in [`zymarg-product-builder/`](./zymarg-produc
 | 6 | done | **Variation Swatches widget** + cross-section sync + smart-greying |
 | 7 | done | **Product Gallery widget** + variation image swap + custom lightbox |
 | 8 | done | Per-product override meta box (display type, hide attributes, ATC overrides, widget disable) |
-| 9 | next | Polish: accessibility, mobile, animations, edge cases |
+| 9 | done | Polish: a11y, URL param sync, grouped/external products, low-stock + backorder, animations, mobile |
 | 10 | next | Translations, screenshots, release |
 
 ## Architecture

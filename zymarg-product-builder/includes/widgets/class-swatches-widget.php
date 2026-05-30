@@ -193,6 +193,17 @@ class Swatches_Widget extends Widget_Base {
 			)
 		);
 
+		$this->add_control(
+			'enable_url_sync',
+			array(
+				'label'        => __( 'Sync Selection to URL', 'zymarg-product-builder' ),
+				'description'  => __( 'Reflect chosen swatches in URL params (e.g. ?attribute_pa_color=red). Restores selection on refresh + back/forward.', 'zymarg-product-builder' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => '',
+				'return_value' => 'yes',
+			)
+		);
+
 		$this->end_controls_section();
 
 		/* Section: Per-attribute display override */

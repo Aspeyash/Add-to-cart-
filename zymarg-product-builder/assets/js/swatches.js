@@ -38,10 +38,12 @@
 		this.channel   = ZPB.product( this.productId );
 		this.selected  = {}; // attribute_pa_color -> slug
 		this.autoFirst = root.getAttribute( 'data-auto-select-first' ) === '1';
+		this.urlSync   = root.getAttribute( 'data-url-sync' ) === '1';
 
 		this.attrGroups   = Array.prototype.slice.call( root.querySelectorAll( '[data-zpb-attr]' ) );
 		this.resetBtn     = root.querySelector( '[data-zpb-reset]' );
 		this.dropdownEls  = Array.prototype.slice.call( root.querySelectorAll( '[data-zpb-dropdown]' ) );
+		this.srStatus     = root.querySelector( '[data-zpb-sr-status]' );
 	}
 
 	SwatchesController.prototype.init = function () {
@@ -97,14 +99,66 @@
 		// When the cart submission succeeds, optionally clear (configurable later).
 		this.channel.on( 'cart:added', function () { /* keep selection */ } );
 
+		// URL param sync: restore selection from URL on load.
+		if ( this.urlSync ) {
+			this.restoreFromURL();
+			window.addEventListener( 'popstate', function () {
+				self.restoreFromURL();
+				self.afterChange();
+			} );
+		}
+
 		// Auto-select the first available variation if requested.
-		if ( this.autoFirst ) {
+		if ( this.autoFirst && Object.keys( this.selected ).length === this.countHiddenAttrs() ) {
 			this.tryAutoSelectFirst();
 		}
 
 		// Initial pass to grey out impossible options + publish state.
+		this.updateActiveStates();
+		this.updateSelectedValueLabels();
 		this.recomputeAvailability();
 		this.publishVariation();
+		this.toggleResetVisibility();
+		this.syncDropdowns();
+	};
+
+	/** Count hidden auto-resolved attributes (so init logic can ignore them). */
+	SwatchesController.prototype.countHiddenAttrs = function () {
+		return this.root.querySelectorAll( '[data-zpb-hidden-attr]' ).length;
+	};
+
+	/** Restore selection from URL query string. */
+	SwatchesController.prototype.restoreFromURL = function () {
+		var params = new URLSearchParams( window.location.search );
+		// Only update VISIBLE attribute selections from URL — don't clobber hidden auto-resolved values.
+		this.attrGroups.forEach( function ( group ) {
+			var attr  = group.getAttribute( 'data-zpb-attr' );
+			var value = params.get( attr );
+			if ( null !== value && '' !== value ) {
+				this.selected[ attr ] = value;
+			} else {
+				delete this.selected[ attr ];
+			}
+		}, this );
+	};
+
+	/** Push current visible selection into URL via replaceState (no scroll, no reload). */
+	SwatchesController.prototype.pushToURL = function () {
+		if ( ! this.urlSync || typeof history === 'undefined' || ! history.replaceState ) return;
+		try {
+			var url    = new URL( window.location.href );
+			var params = url.searchParams;
+			var sel    = this.selected;
+			this.attrGroups.forEach( function ( group ) {
+				var attr = group.getAttribute( 'data-zpb-attr' );
+				if ( sel[ attr ] ) {
+					params.set( attr, sel[ attr ] );
+				} else {
+					params.delete( attr );
+				}
+			} );
+			history.replaceState( history.state, '', url.toString() );
+		} catch ( e ) { /* SecurityError on file:// etc. — ignore */ }
 	};
 
 	/**
@@ -173,6 +227,16 @@
 		this.publishVariation();
 		this.toggleResetVisibility();
 		this.syncDropdowns();
+		this.pushToURL();
+	};
+
+	/** Push a screen-reader announcement (rate-limited via a small debounce). */
+	SwatchesController.prototype.announce = function ( msg ) {
+		if ( ! this.srStatus || ! msg ) return;
+		// Toggle text so repeat announcements aren't suppressed by the AT.
+		this.srStatus.textContent = '';
+		var node = this.srStatus;
+		setTimeout( function () { node.textContent = msg; }, 30 );
 	};
 
 	/**
@@ -328,6 +392,16 @@
 			image:       match.image || '',
 			sku:         match.sku || '',
 		} );
+
+		// SR announcement: "[label values…]. [In stock|Out of stock]."
+		var labelParts = [];
+		this.attrGroups.forEach( function ( group ) {
+			var attr   = group.getAttribute( 'data-zpb-attr' );
+			var swatch = group.querySelector( '[data-value="' + cssEscape( sel[ attr ] || '' ) + '"]' );
+			if ( swatch ) labelParts.push( swatch.getAttribute( 'data-label' ) || sel[ attr ] );
+		} );
+		var stockMsg = match.isInStock ? 'in stock' : 'out of stock';
+		this.announce( labelParts.join( ', ' ) + '. ' + stockMsg + '.' );
 	};
 
 	/** Show/hide the reset link based on whether any VISIBLE attribute is selected. */

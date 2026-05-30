@@ -146,7 +146,9 @@
 		}
 
 		/* ----- Add to Cart ----- */
-		function setBtnState( state, message ) {
+		var successBehavior = root.getAttribute( 'data-success-behavior' ) || 'restore';
+
+		function setBtnState( state, message, allowRetry ) {
 			if ( ! addBtn ) return;
 			addBtn.classList.remove( 'is-loading', 'is-success', 'is-error' );
 			if ( state ) addBtn.classList.add( 'is-' + state );
@@ -155,15 +157,42 @@
 				if ( state === 'loading' ) {
 					btnText.textContent = ( Config.i18n && Config.i18n.adding ) || 'Adding...';
 				} else if ( state === 'success' ) {
-					btnText.textContent = ( Config.i18n && Config.i18n.added ) || 'Added!';
+					if ( successBehavior === 'checkmark' ) {
+						// Clear text so the CSS checkmark icon shows alone.
+						btnText.textContent = '';
+					} else {
+						btnText.textContent = ( Config.i18n && Config.i18n.added ) || 'Added!';
+					}
 				} else {
 					btnText.textContent = btnText.getAttribute( 'data-original' ) || btnText.textContent;
 				}
 			}
 
 			if ( msgEl ) {
-				msgEl.textContent = message || '';
 				msgEl.className = 'zpb-atc__message' + ( state ? ' is-' + state : '' );
+				if ( state === 'error' && allowRetry ) {
+					var retryLabel = ( Config.i18n && Config.i18n.tryAgain ) || 'Try again';
+					msgEl.innerHTML = '';
+					var span = document.createElement( 'span' );
+					span.textContent = ( message || '' ) + ' ';
+					var btn = document.createElement( 'button' );
+					btn.type = 'button';
+					btn.className = 'zpb-atc__retry';
+					btn.setAttribute( 'data-zpb-retry', '' );
+					btn.textContent = retryLabel;
+					msgEl.appendChild( span );
+					msgEl.appendChild( btn );
+				} else {
+					msgEl.textContent = message || '';
+				}
+			}
+
+			// Schedule reset for transient states (success-restore + error-without-retry).
+			if ( state === 'success' && successBehavior !== 'stay' ) {
+				setTimeout( function () { setBtnState( null ); }, 1800 );
+			}
+			if ( state === 'error' && ! allowRetry ) {
+				setTimeout( function () { setBtnState( null ); }, 2500 );
 			}
 		}
 
@@ -211,50 +240,50 @@
 				body: fd,
 			} )
 				.then( function ( res ) {
-					return res.json().catch( function () { return { success: false }; } );
+					return res.json().then( function ( body ) {
+						return { ok: res.ok, status: res.status, body: body };
+					} ).catch( function () {
+						return { ok: res.ok, status: res.status, body: null };
+					} );
 				} )
-				.then( function ( res ) {
-					if ( ! res || ! res.success ) {
-						var err = res && res.data && res.data.message
-							? res.data.message
-							: ( Config.i18n && Config.i18n.error ) || 'Could not add to cart.';
-						setBtnState( 'error', err );
-						channel.emit( 'cart:error', { message: err } );
-						setTimeout( function () { setBtnState( null ); }, 2500 );
+				.then( function ( result ) {
+					var body = result.body;
+					if ( ! body || ! body.success ) {
+						var serverMsg = body && body.data && body.data.message ? body.data.message : '';
+						var fallback = ( Config.i18n && Config.i18n.error ) || 'Could not add to cart.';
+						var category = result.status >= 500 ? 'server'
+							: result.status === 0           ? 'network'
+							: 'validation';
+						var err = serverMsg || fallback;
+						setBtnState( 'error', err, /* retry: */ category !== 'validation' );
+						channel.emit( 'cart:error', { message: err, category: category } );
 						return;
 					}
 
-					setBtnState( 'success', res.data.message || '' );
+					setBtnState( 'success', body.data.message || '' );
 
 					channel.emit( 'cart:added', {
 						productId:   productId,
 						variationId: state.variationId,
 						qty:         qty,
-						fragments:   res.data.fragments || {},
+						fragments:   body.data.fragments || {},
 					} );
 
-					// Apply fragments for theme mini-cart.
-					applyFragments( res.data.fragments );
-
-					// Trigger WC's standard event so other plugins/themes react.
-					triggerWooEvent( 'added_to_cart', [
-						res.data.fragments,
-						null,
-						null,
-					] );
+					applyFragments( body.data.fragments );
+					triggerWooEvent( 'added_to_cart', [ body.data.fragments, null, null ] );
 
 					// Redirects.
 					var target = '';
 					if ( goToCheckout ) {
-						target = res.data.checkout_url || '';
+						target = body.data.checkout_url || '';
 					} else if ( redirect === 'cart' ) {
-						target = res.data.cart_url || '';
+						target = body.data.cart_url || '';
 					} else if ( redirect === 'checkout' ) {
-						target = res.data.checkout_url || '';
+						target = body.data.checkout_url || '';
 					} else if ( redirect === 'custom' && redirectUrl ) {
 						target = redirectUrl;
-					} else if ( res.data.redirect_url ) {
-						target = res.data.redirect_url;
+					} else if ( body.data.redirect_url ) {
+						target = body.data.redirect_url;
 					}
 
 					if ( target ) {
@@ -262,13 +291,24 @@
 						return;
 					}
 
-					setTimeout( function () { setBtnState( null ); }, 1800 );
+					// setBtnState handles the success → null transition based on
+					// the success_behavior setting; no extra setTimeout needed here.
 				} )
 				.catch( function () {
-					var err = ( Config.i18n && Config.i18n.error ) || 'Could not add to cart.';
-					setBtnState( 'error', err );
-					setTimeout( function () { setBtnState( null ); }, 2500 );
+					var err = ( Config.i18n && Config.i18n.networkError ) || ( Config.i18n && Config.i18n.error ) || 'Network error. Try again?';
+					setBtnState( 'error', err, /* retry: */ true );
+					channel.emit( 'cart:error', { message: err, category: 'network' } );
 				} );
+		}
+
+		// Retry: clicking the message area's retry link re-runs the last add.
+		if ( msgEl ) {
+			msgEl.addEventListener( 'click', function ( e ) {
+				var btn = e.target && e.target.closest ? e.target.closest( '[data-zpb-retry]' ) : null;
+				if ( ! btn ) return;
+				e.preventDefault();
+				performAdd( false );
+			} );
 		}
 
 		if ( addBtn ) {
