@@ -34,6 +34,10 @@ final class Admin {
 		// Boot the settings page.
 		Settings::instance();
 
+		// Term form fields + list-table swatch column on attribute taxonomies.
+		Term_Fields::instance();
+		Term_List_Table::instance();
+
 		// Plugins-list row links.
 		add_filter( 'plugin_action_links_' . ZPB_PLUGIN_BASENAME, array( $this, 'plugin_action_links' ) );
 

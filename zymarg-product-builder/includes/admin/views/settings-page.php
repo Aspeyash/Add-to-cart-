@@ -57,7 +57,7 @@ $status = isset( $_GET['status'] ) ? sanitize_key( wp_unslash( $_GET['status'] )
 		<?php
 		$tab_view = ZPB_PLUGIN_DIR . 'includes/admin/views/tab-' . str_replace( '_', '-', $current_tab ) . '.php';
 		if ( file_exists( $tab_view ) ) {
-			$fields = $schema[ $current_tab ]['fields'];
+			$fields = isset( $schema[ $current_tab ]['fields'] ) ? $schema[ $current_tab ]['fields'] : array();
 			include $tab_view;
 		} else {
 			echo '<p>' . esc_html__( 'Unknown tab.', 'zymarg-product-builder' ) . '</p>';

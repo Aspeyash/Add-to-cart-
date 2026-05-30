@@ -51,6 +51,28 @@ final class Settings {
 		add_action( 'admin_post_' . self::ACTION_RESET, array( $this, 'handle_reset' ) );
 	}
 
+	/**
+	 * Detect a likely-conflicting swatches plugin (used by the swatches tab view).
+	 *
+	 * @return string Conflict plugin label or empty string.
+	 */
+	public function detect_swatch_conflict() {
+		if ( ! function_exists( 'is_plugin_active' ) ) {
+			include_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+		$candidates = array(
+			'woo-product-variation-swatches/woo-product-variation-swatches.php' => 'Variation Swatches for WooCommerce',
+			'variation-swatches-for-woocommerce/variation-swatches-for-woocommerce.php' => 'Variation Swatches for WooCommerce',
+			'woocommerce-additional-variation-images/woocommerce-additional-variation-images.php' => 'WooCommerce Additional Variation Images',
+		);
+		foreach ( $candidates as $plugin => $label ) {
+			if ( is_plugin_active( $plugin ) ) {
+				return $label;
+			}
+		}
+		return '';
+	}
+
 	/* ------------------------------------------------------------------
 	 * Menu / rendering
 	 * ------------------------------------------------------------------ */
@@ -137,6 +159,12 @@ final class Settings {
 		$tab = isset( $_POST['zpb_tab'] ) ? sanitize_key( wp_unslash( $_POST['zpb_tab'] ) ) : '';
 		check_admin_referer( self::ACTION_SAVE . '_' . $tab );
 
+		// Swatches tab uses a separate option (zpb_attribute_types), not zpb_settings.
+		if ( 'swatches' === $tab ) {
+			$this->save_swatches_tab();
+			$this->redirect_back( $tab, 'saved' );
+		}
+
 		$schema = $this->get_schema();
 		if ( ! isset( $schema[ $tab ] ) ) {
 			$this->redirect_back( $tab, 'error' );
@@ -150,6 +178,18 @@ final class Settings {
 		$this->redirect_back( $tab, 'saved' );
 	}
 
+	/** Sanitize and persist the swatches tab payload. */
+	private function save_swatches_tab() {
+		$raw   = isset( $_POST['zpb_types'] ) && is_array( $_POST['zpb_types'] ) ? wp_unslash( $_POST['zpb_types'] ) : array(); // phpcs:ignore
+		$valid = Attribute_Settings::get_attribute_choices(); // [ taxonomy => label ]
+		$clean = array();
+		foreach ( $valid as $taxonomy => $label ) {
+			$value = isset( $raw[ $taxonomy ] ) ? (string) $raw[ $taxonomy ] : Attribute_Settings::TYPE_DEFAULT;
+			$clean[ $taxonomy ] = Attribute_Settings::sanitize_type( $value );
+		}
+		Attribute_Settings::update_all( $clean );
+	}
+
 	/** Handle Reset POST (per-tab). */
 	public function handle_reset() {
 		if ( ! current_user_can( self::CAPABILITY ) ) {
@@ -158,6 +198,12 @@ final class Settings {
 
 		$tab = isset( $_POST['zpb_tab'] ) ? sanitize_key( wp_unslash( $_POST['zpb_tab'] ) ) : '';
 		check_admin_referer( self::ACTION_RESET . '_' . $tab );
+
+		// Swatches tab resets the attribute-types option.
+		if ( 'swatches' === $tab ) {
+			Attribute_Settings::update_all( array() );
+			$this->redirect_back( $tab, 'reset' );
+		}
 
 		$schema = $this->get_schema();
 		if ( ! isset( $schema[ $tab ] ) ) {
@@ -377,6 +423,12 @@ final class Settings {
 						'default'     => $defaults['add_to_cart']['use_product_min_max'],
 					),
 				),
+			),
+
+			'swatches' => array(
+				'label'  => __( 'Swatches', 'zymarg-product-builder' ),
+				// Custom view (tab-swatches.php) — no `fields` schema; uses Attribute_Settings option.
+				'custom' => true,
 			),
 		);
 	}
