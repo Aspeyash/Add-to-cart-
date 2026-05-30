@@ -1,0 +1,72 @@
+name: Dev Build (rolling latest-dev release)
+
+# Builds the plugin ZIP on every push to any branch and updates a single
+# rolling pre-release tagged `latest-dev` so there's ALWAYS a stable
+# direct-download URL to the freshest build:
+#
+#   https://github.com/Aspeyash/Add-to-cart-/releases/download/latest-dev/zymarg-product-builder.zip
+#
+# Marked as a pre-release with make_latest=false, so the in-plugin auto-
+# updater (which uses /releases/latest) ignores it cleanly. Stable releases
+# are still produced by release.yml on tag pushes (vX.Y.Z).
+
+on:
+  push:
+    branches:
+      - '**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  dev-build:
+    name: Build plugin ZIP and update latest-dev release
+    runs-on: ubuntu-latest
+    # Skip on tag pushes — release.yml handles those.
+    if: github.ref_type == 'branch'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build plugin ZIP
+        run: |
+          mkdir -p build
+          cp -R zymarg-product-builder build/zymarg-product-builder
+          # Strip dev / OS noise that should never ship.
+          find build/zymarg-product-builder -name '.DS_Store' -delete || true
+          find build/zymarg-product-builder -name 'Thumbs.db' -delete || true
+          find build/zymarg-product-builder -name '*.log'     -delete || true
+          rm -rf build/zymarg-product-builder/.git \
+                 build/zymarg-product-builder/.github \
+                 build/zymarg-product-builder/node_modules \
+                 build/zymarg-product-builder/vendor/bin || true
+          cd build
+          zip -r zymarg-product-builder.zip zymarg-product-builder
+          ls -lh zymarg-product-builder.zip
+
+      - name: Upsert latest-dev rolling release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest-dev
+          name: 'Latest Development Build'
+          body: |
+            **Auto-built on every branch push.** Always points at the freshest commit.
+
+            - Last commit: `${{ github.sha }}`
+            - Branch: `${{ github.ref_name }}`
+            - Built: `${{ github.event.head_commit.timestamp }}`
+
+            ### Direct download
+            **[zymarg-product-builder.zip](https://github.com/${{ github.repository }}/releases/download/latest-dev/zymarg-product-builder.zip)**
+
+            > This is a pre-release, intentionally ignored by the plugin's
+            > auto-updater (which only follows non-prerelease releases via
+            > `/releases/latest`). For stable releases, see the main
+            > [Releases list](https://github.com/${{ github.repository }}/releases).
+          prerelease: true
+          make_latest: 'false'
+          files: build/zymarg-product-builder.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
