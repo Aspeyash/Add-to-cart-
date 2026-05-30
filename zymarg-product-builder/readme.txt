@@ -3,7 +3,7 @@ Contributors: zymarg
 Tags: woocommerce, elementor, add to cart, variation swatches, product gallery
 Requires at least: 6.0
 Tested up to: 6.5
-Stable tag: 0.5.0
+Stable tag: 0.6.0
 Requires PHP: 7.4
 WC requires at least: 7.0
 WC tested up to: 8.9
@@ -88,3 +88,12 @@ Zymarg Product Builder gives Elementor users a set of WooCommerce widgets that s
 * Aspect ratio control: auto, 1:1, 4:3, 3:4, 16:9
 * Featured-image-first toggle
 * Configurable navigation arrows (visible on hover)
+
+
+= 0.6.0 =
+* New: GitHub-based auto-update system. The plugin now polls the GitHub Releases API every 12 hours and surfaces new versions through the standard WordPress update flow (Dashboard -> Updates and Plugins screen).
+* Strict version-aware: an update is offered only when the latest release tag is strictly newer than the installed version (per version_compare).
+* "Check for Updates" link added to the plugin row for on-demand checks.
+* GitHub Action included: tagging vX.Y.Z (or X.Y.Z) automatically builds a clean plugin ZIP and attaches it to the release. The Action also fails if the tag does not match the Version: header, preventing accidental version mismatches.
+* Pre-releases and drafts are excluded automatically (we use /releases/latest).
+* Filesystem-aware extractor handles both attached release ZIPs and zipball fallbacks.

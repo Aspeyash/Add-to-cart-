@@ -1,0 +1,67 @@
+name: Build & Publish Plugin Release
+
+# Triggered when you push a tag like  v0.6.0  or  0.6.0
+# (Leading "v" optional — both work with the in-plugin update checker.)
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+      - '*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build plugin ZIP and create release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Determine version
+        id: version
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG#v}"
+          echo "tag=$TAG"           >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION"   >> "$GITHUB_OUTPUT"
+
+      - name: Verify plugin header version matches tag
+        run: |
+          PLUGIN_FILE="zymarg-product-builder/zymarg-product-builder.php"
+          HEADER_VERSION=$(grep -E '^\s*\*\s*Version:' "$PLUGIN_FILE" | head -n 1 | sed -E 's/.*Version:\s*([0-9][^[:space:]]*).*/\1/')
+          echo "Plugin header reports: $HEADER_VERSION"
+          echo "Tag reports:           ${{ steps.version.outputs.version }}"
+          if [ "$HEADER_VERSION" != "${{ steps.version.outputs.version }}" ]; then
+            echo "::error::Plugin header version ($HEADER_VERSION) does not match tag (${{ steps.version.outputs.version }}). Bump the Version: header in $PLUGIN_FILE before tagging."
+            exit 1
+          fi
+
+      - name: Build plugin ZIP
+        run: |
+          mkdir -p build
+          # Copy the plugin folder so the ZIP root is the plugin slug.
+          cp -R zymarg-product-builder build/zymarg-product-builder
+          # Strip dev/test files that should never ship.
+          find build/zymarg-product-builder -name '.DS_Store'    -delete || true
+          find build/zymarg-product-builder -name 'Thumbs.db'    -delete || true
+          find build/zymarg-product-builder -name '*.log'        -delete || true
+          rm -rf build/zymarg-product-builder/.git \
+                 build/zymarg-product-builder/.github \
+                 build/zymarg-product-builder/node_modules \
+                 build/zymarg-product-builder/vendor/bin || true
+          cd build
+          zip -r zymarg-product-builder.zip zymarg-product-builder
+          ls -lh zymarg-product-builder.zip
+
+      - name: Create / update GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: ${{ steps.version.outputs.tag }}
+          generate_release_notes: true
+          files: build/zymarg-product-builder.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

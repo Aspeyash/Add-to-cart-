@@ -40,3 +40,34 @@ Each widget declares its product source (current product or manual pick), gets t
 ## License
 
 GPL-2.0-or-later
+
+---
+
+## Releasing a new version (auto-update workflow)
+
+The plugin includes a GitHub-based auto-updater. Once the current release is installed, every WordPress site running the plugin will see new versions under **Dashboard → Updates** automatically.
+
+### To ship an update
+
+1. Make your changes on a branch and merge to `main`
+2. Bump the version in **two places** (must match):
+   - `zymarg-product-builder/zymarg-product-builder.php` — the `Version:` header AND `ZPB_VERSION` constant
+   - `zymarg-product-builder/readme.txt` — `Stable tag:` line and add a changelog entry
+3. Commit the version bump
+4. Tag the commit and push the tag:
+   ```bash
+   git tag v0.6.1
+   git push origin v0.6.1
+   ```
+5. The included GitHub Action (`.github/workflows/release.yml`) automatically:
+   - Verifies the plugin's `Version:` header matches the tag (fails the build if not)
+   - Builds a clean `zymarg-product-builder.zip` containing only the plugin folder
+   - Creates a GitHub Release with that ZIP attached
+   - Generates release notes from your commits
+
+Within 12 hours every WP site will see the update notification (or the site owner can click **Plugins → Zymarg Product Builder → Check for Updates** for an instant check).
+
+### Version rules
+- Tags must be `vX.Y.Z` or `X.Y.Z` (e.g. `v0.6.1`, `1.0.0`)
+- The plugin only offers an update when the tag's version is **strictly greater** than the installed version (per PHP `version_compare`)
+- Pre-release / draft GitHub releases are ignored — only the `/releases/latest` tag is considered
