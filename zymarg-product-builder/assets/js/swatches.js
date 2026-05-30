@@ -47,6 +47,17 @@
 	SwatchesController.prototype.init = function () {
 		var self = this;
 
+		// Seed hidden-attribute selections from server-resolved values so
+		// variation matching has the right values without showing a swatch.
+		var hiddenInputs = this.root.querySelectorAll( '[data-zpb-hidden-attr]' );
+		Array.prototype.forEach.call( hiddenInputs, function ( input ) {
+			var attr  = input.getAttribute( 'data-zpb-hidden-attr' );
+			var value = input.value || '';
+			if ( attr && value ) {
+				self.selected[ attr ] = value;
+			}
+		} );
+
 		// Click handlers on each swatch.
 		this.attrGroups.forEach( function ( group ) {
 			var swatches = group.querySelectorAll( '[data-zpb-swatch]' );
@@ -268,16 +279,26 @@
 
 	/**
 	 * Either emit 'variation:selected' (full match) or 'variation:cleared' (incomplete).
+	 *
+	 * Note: only VISIBLE attribute groups count toward "fully selected".
+	 * Hidden attributes (set via data-zpb-hidden-attr) are pre-resolved
+	 * server-side and stay in `this.selected` permanently so variation
+	 * matching works without their swatches being on the page.
 	 */
 	SwatchesController.prototype.publishVariation = function () {
-		var sel = this.selected;
-		var attrCount = this.attrGroups.length;
-		var selCount  = Object.keys( sel ).length;
+		var sel  = this.selected;
+		var self = this;
+		var visibleCount   = this.attrGroups.length;
+		var visibleFilled  = 0;
+		this.attrGroups.forEach( function ( group ) {
+			var attr = group.getAttribute( 'data-zpb-attr' );
+			if ( sel[ attr ] ) visibleFilled++;
+		} );
 
 		// Always update state with the current attributes for AddToCart's submit.
 		this.channel.setState( { selectedAttributes: sel } );
 
-		if ( selCount < attrCount ) {
+		if ( visibleFilled < visibleCount ) {
 			this.channel.setState( { variationId: 0 } );
 			this.channel.emit( 'variation:cleared', {} );
 			return;
@@ -309,10 +330,15 @@
 		} );
 	};
 
-	/** Show/hide the reset link based on whether any attribute is selected. */
+	/** Show/hide the reset link based on whether any VISIBLE attribute is selected. */
 	SwatchesController.prototype.toggleResetVisibility = function () {
 		if ( ! this.resetBtn ) return;
-		var hasAny = Object.keys( this.selected ).length > 0;
+		var sel = this.selected;
+		var hasAny = false;
+		for ( var i = 0; i < this.attrGroups.length; i++ ) {
+			var attr = this.attrGroups[ i ].getAttribute( 'data-zpb-attr' );
+			if ( sel[ attr ] ) { hasAny = true; break; }
+		}
 		if ( hasAny ) {
 			this.resetBtn.removeAttribute( 'hidden' );
 		} else {
@@ -320,9 +346,13 @@
 		}
 	};
 
-	/** Reset all selections. */
+	/** Reset visible selections (hidden auto-resolved attrs are preserved). */
 	SwatchesController.prototype.reset = function () {
-		this.selected = {};
+		var self = this;
+		this.attrGroups.forEach( function ( group ) {
+			var attr = group.getAttribute( 'data-zpb-attr' );
+			delete self.selected[ attr ];
+		} );
 		this.afterChange();
 	};
 

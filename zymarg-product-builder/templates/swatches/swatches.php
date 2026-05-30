@@ -17,6 +17,7 @@ defined( 'ABSPATH' ) || exit;
 
 use Zymarg\ProductBuilder\Admin\Attribute_Settings;
 use Zymarg\ProductBuilder\Admin\Term_Meta;
+use Zymarg\ProductBuilder\Product_Overrides;
 use Zymarg\ProductBuilder\Widgets\Swatches_Widget;
 
 /** @var \WC_Product $product */
@@ -30,6 +31,12 @@ $show_price    = ! empty( $settings['show_per_swatch_price'] ) && 'yes' === $set
 $show_reset    = ! empty( $settings['show_reset'] ) && 'yes' === $settings['show_reset'];
 $reset_text    = ! empty( $settings['reset_text'] ) ? $settings['reset_text'] : __( 'Reset selection', 'zymarg-product-builder' );
 $auto_first    = ! empty( $settings['auto_select_first'] ) && 'yes' === $settings['auto_select_first'];
+
+// Per-product hidden attributes — auto-resolve sensible defaults so cart
+// submission still picks a real variation.
+$hidden_resolved = class_exists( '\Zymarg\ProductBuilder\Product_Overrides' )
+	? Product_Overrides::resolve_hidden_attributes( $product )
+	: array();
 
 // Build a price-per-swatch lookup if needed: attribute_key => term_slug => priceHtml
 $price_map = array();
@@ -67,8 +74,15 @@ if ( $show_price ) {
 		$taxonomy = wc_attribute_taxonomy_name( str_replace( 'attribute_', '', $attribute_name ) );
 		$is_taxonomy = $taxonomy && taxonomy_exists( $taxonomy );
 
+		// Per-product hidden — skip rendering this attribute entirely.
+		if ( $is_taxonomy
+			&& class_exists( '\Zymarg\ProductBuilder\Product_Overrides' )
+			&& Product_Overrides::is_attribute_hidden( $product->get_id(), $taxonomy ) ) {
+			continue;
+		}
+
 		$type = $is_taxonomy
-			? Swatches_Widget::resolve_display_type( $taxonomy, $settings )
+			? Swatches_Widget::resolve_display_type( $taxonomy, $settings, $product->get_id() )
 			: Attribute_Settings::TYPE_DEFAULT;
 
 		// Human label (e.g. "Color").
@@ -162,4 +176,12 @@ if ( $show_price ) {
 			<?php echo esc_html( $reset_text ); ?>
 		</button>
 	<?php endif; ?>
+
+	<?php /* Hidden attributes — auto-resolved server-side so JS variation
+	         matching has the right values without showing a swatch. */ ?>
+	<?php foreach ( $hidden_resolved as $attr_key => $attr_value ) : ?>
+		<input type="hidden"
+			data-zpb-hidden-attr="<?php echo esc_attr( $attr_key ); ?>"
+			value="<?php echo esc_attr( $attr_value ); ?>" />
+	<?php endforeach; ?>
 </div>

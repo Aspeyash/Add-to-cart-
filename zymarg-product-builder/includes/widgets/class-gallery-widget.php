@@ -15,6 +15,7 @@ use Zymarg\ProductBuilder\Assets;
 use Zymarg\ProductBuilder\Frontend\Product_Data;
 use Zymarg\ProductBuilder\Plugin;
 use Zymarg\ProductBuilder\Product_Context;
+use Zymarg\ProductBuilder\Product_Overrides;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -602,6 +603,15 @@ class Gallery_Widget extends Widget_Base {
 			return;
 		}
 
+		// Per-product disable check.
+		if ( class_exists( '\Zymarg\ProductBuilder\Product_Overrides' )
+			&& Product_Overrides::is_widget_disabled( $product->get_id(), 'gallery' ) ) {
+			if ( $this->is_editor_mode() ) {
+				$this->render_placeholder( __( 'Product Gallery widget is disabled for this product (Product Builder tab).', 'zymarg-product-builder' ) );
+			}
+			return;
+		}
+
 		Product_Data::instance()->queue( $product->get_id() );
 
 		// Build the image list (featured + gallery).
@@ -638,6 +648,14 @@ class Gallery_Widget extends Widget_Base {
 			<p><?php echo esc_html( $message ); ?></p>
 		</div>
 		<?php
+	}
+
+	/** Whether we are rendering inside the Elementor editor. */
+	private function is_editor_mode() {
+		return class_exists( '\Elementor\Plugin' )
+			&& \Elementor\Plugin::$instance
+			&& \Elementor\Plugin::$instance->editor
+			&& \Elementor\Plugin::$instance->editor->is_edit_mode();
 	}
 
 	/**

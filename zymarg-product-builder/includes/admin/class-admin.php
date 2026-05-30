@@ -38,6 +38,9 @@ final class Admin {
 		Term_Fields::instance();
 		Term_List_Table::instance();
 
+		// Per-product overrides meta box on the product edit screen.
+		Product_Meta_Box::instance();
+
 		// Plugins-list row links.
 		add_filter( 'plugin_action_links_' . ZPB_PLUGIN_BASENAME, array( $this, 'plugin_action_links' ) );
 

@@ -18,6 +18,7 @@ use Zymarg\ProductBuilder\Assets;
 use Zymarg\ProductBuilder\Frontend\Product_Data;
 use Zymarg\ProductBuilder\Plugin;
 use Zymarg\ProductBuilder\Product_Context;
+use Zymarg\ProductBuilder\Product_Overrides;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -706,6 +707,36 @@ class Add_To_Cart_Widget extends Widget_Base {
 			return;
 		}
 
+		// Per-product disable check — render nothing on front-end, placeholder in editor.
+		if ( class_exists( '\Zymarg\ProductBuilder\Product_Overrides' )
+			&& Product_Overrides::is_widget_disabled( $product->get_id(), 'add_to_cart' ) ) {
+			if ( $this->is_editor_mode() ) {
+				$this->render_placeholder( __( 'Add to Cart widget is disabled for this product (Product Builder tab).', 'zymarg-product-builder' ) );
+			}
+			return;
+		}
+
+		// Apply per-product Add to Cart overrides on top of Elementor settings.
+		$pid = $product->get_id();
+		if ( class_exists( '\Zymarg\ProductBuilder\Product_Overrides' ) ) {
+			$override_button_text = (string) Product_Overrides::get( $pid, 'add_to_cart.button_text', '' );
+			if ( '' !== $override_button_text ) {
+				$settings['button_text'] = $override_button_text;
+			}
+
+			$override_buy_now = (string) Product_Overrides::get( $pid, 'add_to_cart.show_buy_now', '' );
+			if ( 'yes' === $override_buy_now ) {
+				$settings['show_buy_now'] = 'yes';
+			} elseif ( 'no' === $override_buy_now ) {
+				$settings['show_buy_now'] = '';
+			}
+
+			$override_redirect = (string) Product_Overrides::get( $pid, 'add_to_cart.redirect_after', '' );
+			if ( '' !== $override_redirect ) {
+				$settings['redirect_after'] = $override_redirect;
+			}
+		}
+
 		// Queue product for footer JSON.
 		Product_Data::instance()->queue( $product->get_id() );
 
@@ -725,22 +756,35 @@ class Add_To_Cart_Widget extends Widget_Base {
 
 	/**
 	 * Render an editor placeholder so the widget shows something useful when
-	 * dropped onto a page that has no product context.
+	 * dropped onto a page that has no product context (or is disabled).
+	 *
+	 * @param string $message Optional custom message.
 	 */
-	private function render_placeholder() {
+	private function render_placeholder( $message = '' ) {
+		if ( '' === $message ) {
+			$message = __( 'Select a product or place this widget on a single product page.', 'zymarg-product-builder' );
+		}
 		$button_text = ! empty( $this->get_settings_for_display( 'button_text' ) )
 			? $this->get_settings_for_display( 'button_text' )
 			: __( 'Add to Cart', 'zymarg-product-builder' );
 		?>
 		<div class="zpb-atc zpb-atc--placeholder">
 			<p class="zpb-atc__notice">
-				<?php esc_html_e( 'Select a product or place this widget on a single product page.', 'zymarg-product-builder' ); ?>
+				<?php echo esc_html( $message ); ?>
 			</p>
 			<button type="button" class="zpb-atc__btn" disabled>
 				<?php echo esc_html( $button_text ); ?>
 			</button>
 		</div>
 		<?php
+	}
+
+	/** Whether we are rendering inside the Elementor editor. */
+	private function is_editor_mode() {
+		return class_exists( '\Elementor\Plugin' )
+			&& \Elementor\Plugin::$instance
+			&& \Elementor\Plugin::$instance->editor
+			&& \Elementor\Plugin::$instance->editor->is_edit_mode();
 	}
 
 	/**

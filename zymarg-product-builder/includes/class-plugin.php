@@ -65,11 +65,14 @@ final class Plugin {
 			require_once ZPB_PLUGIN_DIR . 'includes/admin/class-term-list-table.php';
 			require_once ZPB_PLUGIN_DIR . 'includes/admin/class-settings.php';
 			require_once ZPB_PLUGIN_DIR . 'includes/admin/class-admin.php';
+			require_once ZPB_PLUGIN_DIR . 'includes/class-product-overrides.php';
+			require_once ZPB_PLUGIN_DIR . 'includes/admin/class-product-meta-box.php';
 		} else {
-			// Front-end still needs the store + term reader to render swatches.
+			// Front-end still needs the store + term reader + overrides to render swatches.
 			require_once ZPB_PLUGIN_DIR . 'includes/admin/class-settings-store.php';
 			require_once ZPB_PLUGIN_DIR . 'includes/admin/class-attribute-settings.php';
 			require_once ZPB_PLUGIN_DIR . 'includes/admin/class-term-meta.php';
+			require_once ZPB_PLUGIN_DIR . 'includes/class-product-overrides.php';
 		}
 	}
 

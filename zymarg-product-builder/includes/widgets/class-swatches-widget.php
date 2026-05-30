@@ -19,6 +19,7 @@ use Zymarg\ProductBuilder\Assets;
 use Zymarg\ProductBuilder\Frontend\Product_Data;
 use Zymarg\ProductBuilder\Plugin;
 use Zymarg\ProductBuilder\Product_Context;
+use Zymarg\ProductBuilder\Product_Overrides;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -702,6 +703,15 @@ class Swatches_Widget extends Widget_Base {
 			return;
 		}
 
+		// Per-product disable check.
+		if ( class_exists( '\Zymarg\ProductBuilder\Product_Overrides' )
+			&& Product_Overrides::is_widget_disabled( $product->get_id(), 'swatches' ) ) {
+			if ( $this->is_editor_mode() ) {
+				$this->render_placeholder( __( 'Variation Swatches widget is disabled for this product (Product Builder tab).', 'zymarg-product-builder' ) );
+			}
+			return;
+		}
+
 		if ( ! $product->is_type( 'variable' ) ) {
 			$this->render_placeholder( __( 'Variation Swatches are only available for variable products.', 'zymarg-product-builder' ) );
 			return;
@@ -729,6 +739,14 @@ class Swatches_Widget extends Widget_Base {
 		}
 	}
 
+	/** Whether we are rendering inside the Elementor editor. */
+	private function is_editor_mode() {
+		return class_exists( '\Elementor\Plugin' )
+			&& \Elementor\Plugin::$instance
+			&& \Elementor\Plugin::$instance->editor
+			&& \Elementor\Plugin::$instance->editor->is_edit_mode();
+	}
+
 	/**
 	 * Render an editor / fallback placeholder.
 	 *
@@ -747,17 +765,24 @@ class Swatches_Widget extends Widget_Base {
 	 * ==================================================================== */
 
 	/**
-	 * Resolve display type for a taxonomy: per-widget override → global → default.
+	 * Resolve display type for a taxonomy: per-product override → per-widget
+	 * override → global → default.
 	 *
-	 * @param string $taxonomy Taxonomy slug (e.g. 'pa_color').
-	 * @param array  $settings Widget settings.
+	 * @param string $taxonomy   Taxonomy slug (e.g. 'pa_color').
+	 * @param array  $settings   Widget settings.
+	 * @param int    $product_id Product ID (0 if unknown).
 	 * @return string
 	 */
-	public static function resolve_display_type( $taxonomy, $settings ) {
+	public static function resolve_display_type( $taxonomy, $settings, $product_id = 0 ) {
+		// 1) Per-widget override (Elementor control).
 		$override_key = 'override_' . $taxonomy;
 		$override     = isset( $settings[ $override_key ] ) ? (string) $settings[ $override_key ] : 'inherit';
 		if ( 'inherit' !== $override && '' !== $override && array_key_exists( $override, Attribute_Settings::types() ) ) {
 			return $override;
+		}
+		// 2) Per-product override → 3) global → 4) default — handled inside Product_Overrides.
+		if ( $product_id && class_exists( '\Zymarg\ProductBuilder\Product_Overrides' ) ) {
+			return Product_Overrides::get_attribute_display( $product_id, $taxonomy );
 		}
 		return Attribute_Settings::get_type( $taxonomy );
 	}
