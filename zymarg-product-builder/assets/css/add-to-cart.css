@@ -195,3 +195,14 @@
 
 /* RTL: margin-inline already handles, but explicit override safety */
 [dir="rtl"] .zpb-spinner { margin-inline-start: 8px; }
+
+
+/* Out-of-stock message variant */
+.zpb-atc__oos-message {
+	padding: 10px 14px;
+	background: #fff5f5;
+	color: #c92a2a;
+	border: 1px solid #f1d1d1;
+	border-radius: 4px;
+	font-weight: 600;
+}

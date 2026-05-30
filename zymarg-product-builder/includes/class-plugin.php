@@ -55,6 +55,16 @@ final class Plugin {
 		require_once ZPB_PLUGIN_DIR . 'includes/class-product-context.php';
 		require_once ZPB_PLUGIN_DIR . 'includes/class-ajax.php';
 		require_once ZPB_PLUGIN_DIR . 'includes/frontend/class-product-data.php';
+
+		// Admin layer (settings page, plugin row links, welcome notice).
+		if ( is_admin() ) {
+			require_once ZPB_PLUGIN_DIR . 'includes/admin/class-settings-store.php';
+			require_once ZPB_PLUGIN_DIR . 'includes/admin/class-settings.php';
+			require_once ZPB_PLUGIN_DIR . 'includes/admin/class-admin.php';
+		} else {
+			// Front-end still needs the store to read defaults.
+			require_once ZPB_PLUGIN_DIR . 'includes/admin/class-settings-store.php';
+		}
 	}
 
 	/**
@@ -71,6 +81,10 @@ final class Plugin {
 		Assets::instance();
 		Ajax::instance();
 		Frontend\Product_Data::instance();
+
+		if ( is_admin() ) {
+			Admin\Admin::instance();
+		}
 	}
 
 	/**

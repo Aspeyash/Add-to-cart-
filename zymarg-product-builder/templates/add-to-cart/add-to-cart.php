@@ -15,14 +15,19 @@
 
 defined( 'ABSPATH' ) || exit;
 
+use Zymarg\ProductBuilder\Admin\Settings_Store;
+
 /** @var \WC_Product $product */
 /** @var array $settings */
 
 $product_id   = $product->get_id();
 $is_variable  = $product->is_type( 'variable' );
 $is_in_stock  = $product->is_in_stock();
+
+// Min/max from product, gated by admin setting.
+$use_min_max  = 'yes' === Settings_Store::get( 'add_to_cart.use_product_min_max', 'yes' );
 $min_qty      = 1;
-$max_qty      = $product->get_max_purchase_quantity();
+$max_qty      = $use_min_max ? $product->get_max_purchase_quantity() : -1;
 $max_qty_attr = is_numeric( $max_qty ) && $max_qty > 0 ? (int) $max_qty : '';
 
 $show_stock         = ! empty( $settings['show_stock'] ) && 'yes' === $settings['show_stock'];
@@ -41,8 +46,14 @@ if ( 'custom' === $redirect_after && ! empty( $settings['redirect_url']['url'] )
 	$redirect_url_value = esc_url( $settings['redirect_url']['url'] );
 }
 
+// Out-of-stock behavior from admin defaults.
+$oos_behavior = Settings_Store::get( 'add_to_cart.out_of_stock_behavior', 'disable' );
+$oos_text     = Settings_Store::get( 'add_to_cart.out_of_stock_text', __( 'Out of Stock', 'zymarg-product-builder' ) );
+$hide_button  = ! $is_in_stock && 'hide' === $oos_behavior;
+$show_oos_msg = ! $is_in_stock && 'message' === $oos_behavior;
+
 // Stock label.
-$stock_text  = $is_in_stock ? __( 'In Stock', 'zymarg-product-builder' ) : __( 'Out of Stock', 'zymarg-product-builder' );
+$stock_text  = $is_in_stock ? __( 'In Stock', 'zymarg-product-builder' ) : $oos_text;
 $stock_class = $is_in_stock ? 'is-in-stock' : 'is-out-of-stock';
 ?>
 <div class="zpb-atc"
@@ -90,23 +101,25 @@ $stock_class = $is_in_stock ? 'is-in-stock' : 'is-out-of-stock';
 	<?php endif; ?>
 
 	<div class="zpb-atc__buttons">
-		<button
-			type="button"
-			class="zpb-atc__btn"
-			data-zpb-add-to-cart
-			<?php disabled( ! $is_in_stock ); ?>
-		>
-			<?php if ( ! empty( $settings['button_icon']['value'] ) && 'before' === $icon_position ) : ?>
-				<span class="zpb-icon zpb-icon--before"><?php \Elementor\Icons_Manager::render_icon( $settings['button_icon'], array( 'aria-hidden' => 'true' ) ); ?></span>
-			<?php endif; ?>
-			<span class="zpb-atc__btn-text"><?php echo esc_html( $is_in_stock ? $button_text : __( 'Out of Stock', 'zymarg-product-builder' ) ); ?></span>
-			<?php if ( ! empty( $settings['button_icon']['value'] ) && 'after' === $icon_position ) : ?>
-				<span class="zpb-icon zpb-icon--after"><?php \Elementor\Icons_Manager::render_icon( $settings['button_icon'], array( 'aria-hidden' => 'true' ) ); ?></span>
-			<?php endif; ?>
-			<span class="zpb-spinner" aria-hidden="true"></span>
-		</button>
+		<?php if ( ! $hide_button ) : ?>
+			<button
+				type="button"
+				class="zpb-atc__btn"
+				data-zpb-add-to-cart
+				<?php disabled( ! $is_in_stock ); ?>
+			>
+				<?php if ( ! empty( $settings['button_icon']['value'] ) && 'before' === $icon_position ) : ?>
+					<span class="zpb-icon zpb-icon--before"><?php \Elementor\Icons_Manager::render_icon( $settings['button_icon'], array( 'aria-hidden' => 'true' ) ); ?></span>
+				<?php endif; ?>
+				<span class="zpb-atc__btn-text"><?php echo esc_html( $is_in_stock ? $button_text : $oos_text ); ?></span>
+				<?php if ( ! empty( $settings['button_icon']['value'] ) && 'after' === $icon_position ) : ?>
+					<span class="zpb-icon zpb-icon--after"><?php \Elementor\Icons_Manager::render_icon( $settings['button_icon'], array( 'aria-hidden' => 'true' ) ); ?></span>
+				<?php endif; ?>
+				<span class="zpb-spinner" aria-hidden="true"></span>
+			</button>
+		<?php endif; ?>
 
-		<?php if ( $show_buy_now ) : ?>
+		<?php if ( $show_buy_now && ! $hide_button ) : ?>
 			<button
 				type="button"
 				class="zpb-atc__buy-now"
@@ -115,6 +128,10 @@ $stock_class = $is_in_stock ? 'is-in-stock' : 'is-out-of-stock';
 			>
 				<?php echo esc_html( $buy_now_text ); ?>
 			</button>
+		<?php endif; ?>
+
+		<?php if ( $show_oos_msg ) : ?>
+			<div class="zpb-atc__oos-message"><?php echo esc_html( $oos_text ); ?></div>
 		<?php endif; ?>
 	</div>
 
