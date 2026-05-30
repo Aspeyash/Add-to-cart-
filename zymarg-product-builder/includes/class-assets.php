@@ -30,6 +30,12 @@ final class Assets {
 	/** Handle for Variation Swatches widget CSS. */
 	const HANDLE_SWATCHES_CSS = 'zpb-swatches';
 
+	/** Handle for Product Gallery widget JS. */
+	const HANDLE_GALLERY_JS = 'zpb-gallery';
+
+	/** Handle for Product Gallery widget CSS. */
+	const HANDLE_GALLERY_CSS = 'zpb-gallery';
+
 	/**
 	 * Singleton instance.
 	 *
@@ -120,6 +126,22 @@ final class Assets {
 			array(),
 			ZPB_VERSION
 		);
+
+		// Product Gallery widget assets.
+		wp_register_script(
+			self::HANDLE_GALLERY_JS,
+			ZPB_ASSETS_URL . 'js/gallery.js',
+			array( self::HANDLE_STATE ),
+			ZPB_VERSION,
+			true
+		);
+
+		wp_register_style(
+			self::HANDLE_GALLERY_CSS,
+			ZPB_ASSETS_URL . 'css/gallery.css',
+			array(),
+			ZPB_VERSION
+		);
 	}
 
 	/**
@@ -135,6 +157,12 @@ final class Assets {
 		wp_enqueue_style(
 			'zpb-editor-swatches',
 			ZPB_ASSETS_URL . 'css/swatches.css',
+			array(),
+			ZPB_VERSION
+		);
+		wp_enqueue_style(
+			'zpb-editor-gallery',
+			ZPB_ASSETS_URL . 'css/gallery.css',
 			array(),
 			ZPB_VERSION
 		);
@@ -156,5 +184,14 @@ final class Assets {
 		wp_enqueue_style( self::HANDLE_SWATCHES_CSS );
 		wp_enqueue_script( self::HANDLE_STATE );
 		wp_enqueue_script( self::HANDLE_SWATCHES_JS );
+	}
+
+	/**
+	 * Enqueue everything needed for the Product Gallery widget.
+	 */
+	public static function enqueue_gallery() {
+		wp_enqueue_style( self::HANDLE_GALLERY_CSS );
+		wp_enqueue_script( self::HANDLE_STATE );
+		wp_enqueue_script( self::HANDLE_GALLERY_JS );
 	}
 }
