@@ -3,7 +3,7 @@ Contributors: zymarg
 Tags: woocommerce, elementor, add to cart, variation swatches, product gallery
 Requires at least: 6.0
 Tested up to: 6.5
-Stable tag: 0.2.0
+Stable tag: 0.3.0
 Requires PHP: 7.4
 WC requires at least: 7.0
 WC tested up to: 8.9
@@ -55,3 +55,12 @@ Zymarg Product Builder gives Elementor users a set of WooCommerce widgets that s
 * Out-of-stock behavior: Disable button / Hide button / Show message (admin-configurable)
 * Plugins-list "Settings" and "Docs" links
 * One-time welcome notice on activation
+
+
+= 0.3.0 =
+* Admin: new "Swatches" tab in the settings page for per-attribute display type configuration (Default Dropdown / Color / Image / Label / Button)
+* Admin: per-term meta fields on each WooCommerce attribute term page (color picker for Color attributes, media library upload for Image attributes, custom label, tooltip)
+* Admin: "Swatch" preview column added to attribute term list tables (color square, image thumbnail, or text label)
+* New helper API: Attribute_Settings::get_type(), Term_Meta::get_swatch(), Term_Meta::get_color(), Term_Meta::get_image_url()
+* Conflict detection: warning notice if another swatches plugin is detected
+* Split-color (two-tone) swatch support for color attributes
