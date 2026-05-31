@@ -126,7 +126,9 @@ if ( $show_price ) {
 					'is_taxonomy'     => $is_taxonomy,
 					'taxonomy'        => $taxonomy,
 				);
-				extract( $context, EXTR_SKIP ); // phpcs:ignore
+				// EXTR_OVERWRITE so this loop iteration's values overwrite
+				// the previous iteration's $attribute_name etc.
+				extract( $context, EXTR_OVERWRITE ); // phpcs:ignore
 				include ZPB_TEMPLATES_DIR . 'swatches/_dropdown.php';
 				?>
 			<?php else : ?>
@@ -162,7 +164,14 @@ if ( $show_price ) {
 							'swatch_price' => $swatch_price,
 						);
 
-						extract( $partial_context, EXTR_SKIP ); // phpcs:ignore
+						// CRITICAL: use EXTR_OVERWRITE (the default) so each
+						// loop iteration's $value etc. correctly overwrites
+						// the previous iteration's. Using EXTR_SKIP here
+						// caused all swatches in subsequent attribute groups
+						// to keep the FIRST attribute's last value (bug found
+						// in the wild: clicking size 40 selected color
+						// "Blue" because $value was stuck).
+						extract( $partial_context, EXTR_OVERWRITE ); // phpcs:ignore
 
 						$partial = ZPB_TEMPLATES_DIR . 'swatches/_' . $type . '.php';
 						if ( file_exists( $partial ) ) {
